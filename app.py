@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, jsonify
 import os
+from fetchSolarIrradiance import fetchSolarIrradiance
 
 app = Flask(__name__)
 
@@ -33,6 +34,8 @@ def predict_location():
         "longitude": longitude,
         "message": "Location received and saved to coords.txt"
     }
+
+    fetchSolarIrradiance(latitude, longitude)
 
     return jsonify(prediction)
 
