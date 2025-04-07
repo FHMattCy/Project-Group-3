@@ -36,15 +36,40 @@ def enter_location():
         longitude = request.form.get('longitude')
 
         if not latitude or not longitude:
-            return render_template('location.html', error="Please enter both latitude and longitude.")
+            return render_template(
+                'location.html',
+                error="Please enter both latitude and longitude.",
+                latitude=latitude,
+                longitude=longitude
+            )
 
         coords_message = f"Latitude: {latitude}, Longitude: {longitude}\n"
         with open(coords_file, 'w') as file:
             file.write(coords_message)
 
-        return render_template('location.html', success="Coordinates saved successfully!")
+        return render_template(
+            'location.html',
+            success="Coordinates saved successfully!",
+            latitude_display=latitude,
+            longitude_display=longitude
+        )
 
-    return render_template('location.html')
+
+    # Method GET — ลองอ่าน coords.txt ถ้ามี
+    lat, lon = None, None
+    if os.path.exists(coords_file):
+        with open(coords_file, 'r') as file:
+            content = file.read().strip()
+            try:
+                # แยกพิกัดจากข้อความในไฟล์
+                parts = content.replace("Latitude: ", "").replace("Longitude: ", "").split(',')
+                lat = parts[0].strip()
+                lon = parts[1].strip()
+            except IndexError:
+                pass  # ถ้าอ่านไม่ได้ก็ไม่ต้องแสดง
+
+    return render_template('location.html', latitude=lat, longitude=lon)
 
 if __name__ == '__main__':
+    print("✅ Starting Flask app...")
     app.run(debug=True)
