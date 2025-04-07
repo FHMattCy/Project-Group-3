@@ -1,12 +1,26 @@
 body {
     font-family: Arial, sans-serif;
     text-align: center;
-}
-
-form {
     margin: 20px;
 }
 
-h3 {
-    color: black;
+form {
+    margin: 20px auto;
+    display: inline-block;
+}
+
+input {
+    width: 200px;
+    padding: 5px;
+}
+
+button {
+    padding: 8px 16px;
+    cursor: pointer;
+}
+
+a {
+    display: block;
+    margin-top: 20px;
+    color: blue;
 }

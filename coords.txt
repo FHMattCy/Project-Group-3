@@ -1,1 +1,1 @@
-Latitude: 13.75, Longitude: 100.5167
+Latitude: 100, Longitude: 300

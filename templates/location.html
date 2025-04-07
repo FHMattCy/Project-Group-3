@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Manual Coordinates Input</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+    <h3>Enter Latitude and Longitude Manually</h3>
+
+    {% if error %}
+        <p style="color: red;">{{ error }}</p>
+    {% endif %}
+    {% if success %}
+        <p style="color: green;">{{ success }}</p>
+    {% endif %}
+
+    <form method="POST" action="/location">
+        <label for="latitude">Latitude:</label>
+        <input type="text" name="latitude" id="latitude" value="{{ latitude or '' }}" required><br><br>
+
+        <label for="longitude">Longitude:</label>
+        <input type="text" name="longitude" id="longitude" value="{{ longitude or '' }}" required><br><br>
+        
+        <button type="submit">Save Coordinates</button>
+    </form>
+
+    {% if latitude and longitude %}
+        <h4>Latitude: <span id="lat-result">{{ latitude }}</span></h4>
+        <h4>Longitude: <span id="lon-result">{{ longitude }}</span></h4>
+    {% endif %}
+
+    <p><a href="/">Back to city/country lookup</a></p>
+
+</body>
+</html>
