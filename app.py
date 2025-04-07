@@ -24,16 +24,13 @@ def predict_location():
     with open(coords_file, 'w') as file:
         file.write(coords_message)
 
+    fetchSolarIrradiance(latitude, longitude)
+
     return jsonify({
         "latitude": latitude,
         "longitude": longitude,
         "message": "Location received and saved to coords.txt"
     })
-
-
-    fetchSolarIrradiance(latitude, longitude)
-
-    return jsonify(prediction)
 
 @app.route('/location', methods=['GET', 'POST'])
 def enter_location():
@@ -52,6 +49,9 @@ def enter_location():
         coords_message = f"Latitude: {latitude}, Longitude: {longitude}\n"
         with open(coords_file, 'w') as file:
             file.write(coords_message)
+
+        fetchSolarIrradiance(latitude, longitude)
+
 
         return render_template(
             'location.html',
