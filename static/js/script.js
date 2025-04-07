@@ -46,3 +46,30 @@ function sendToBackend(latitude, longitude) {
         console.error("Error sending data to backend:", error);
     });
 }
+
+// PV system form submission
+document.getElementById('pv-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    const area = parseFloat(document.getElementById('area').value);
+    const panelEff = parseFloat(document.getElementById('panel-eff').value);
+    const inverterEff = parseFloat(document.getElementById('inverter-eff').value);
+
+    fetch('/submit_pv', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            area: area,
+            panel_efficiency: panelEff,
+            inverter_efficiency: inverterEff
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById('response-message').innerText = data.message;
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        document.getElementById('response-message').innerText = 'An error occurred.';
+    });
+});
