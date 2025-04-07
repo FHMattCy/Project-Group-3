@@ -70,6 +70,23 @@ def enter_location():
 
     return render_template('location.html', latitude=lat, longitude=lon)
 
+# Route to handle PV system configuration
+@app.route('/submit_pv', methods=['POST'])
+def submit_pv():
+    data = request.get_json()
+
+    area = data.get('area')
+    panel_eff = data.get('panel_efficiency')
+    inverter_eff = data.get('inverter_efficiency')
+
+    # Write PV system configuration to file
+    with open('pv_config.txt', 'w', encoding='utf-8') as f:
+        f.write(f"Panel Area: {area} m²\n")
+        f.write(f"Panel Efficiency: {panel_eff}\n")
+        f.write(f"Inverter Efficiency: {inverter_eff}\n")
+
+    return jsonify({"message": "PV system configuration saved successfully."})
+
 if __name__ == '__main__':
     print("✅ Starting Flask app...")
     app.run(debug=True)
