@@ -52,7 +52,6 @@ def enter_location():
 
         fetchSolarIrradiance(latitude, longitude)
 
-
         return render_template(
             'location.html',
             success="Coordinates saved successfully!",
