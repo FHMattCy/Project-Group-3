@@ -46,3 +46,57 @@ function sendToBackend(latitude, longitude) {
         console.error("Error sending data to backend:", error);
     });
 }
+<<<<<<< Updated upstream
+=======
+
+// PV system form
+document.getElementById('pv-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    const area = parseFloat(document.getElementById('area').value);
+    const panelEff = parseFloat(document.getElementById('panel-eff').value);
+    const inverterEff = parseFloat(document.getElementById('inverter-eff').value);
+    const responseMsg = document.getElementById('response-message');
+
+    if (isNaN(area) || area <= 0) {
+        responseMsg.textContent = "⚠️ Must be a positive number.";
+        return;
+    }
+
+    if (isNaN(panelEff) || panelEff < 0 || panelEff > 1) {
+        responseMsg.textContent = "⚠️ Must be between 0 and 1.";
+        return;
+    }
+
+    if (isNaN(inverterEff) || inverterEff < 0 || inverterEff > 1) {
+        responseMsg.textContent = "⚠️ Must be between 0 and 1.";
+        return;
+    }
+
+        
+    // Clear error message
+    responseMsg.textContent = "";
+
+
+ // Send to backend
+    fetch('/submit_pv', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            area: area,
+            panel_efficiency: panelEff,
+            inverter_efficiency: inverterEff
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        responseMsg.style.color = "green";
+        responseMsg.textContent = data.message;
+    })
+    .catch(error => {
+        responseMsg.style.color = "red";
+        responseMsg.textContent = "❌ Error submitting data.";
+        console.error(error);
+    });
+});
+>>>>>>> Stashed changes
