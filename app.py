@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, jsonify
 import os
+from fetchSolarIrradiance import fetchSolarIrradiance
 
 app = Flask(__name__)
 
@@ -22,6 +23,8 @@ def predict_location():
     coords_message = f"Latitude: {latitude}, Longitude: {longitude}\n"
     with open(coords_file, 'w') as file:
         file.write(coords_message)
+
+    fetchSolarIrradiance(latitude, longitude)
 
     return jsonify({
         "latitude": latitude,
@@ -46,6 +49,9 @@ def enter_location():
         coords_message = f"Latitude: {latitude}, Longitude: {longitude}\n"
         with open(coords_file, 'w') as file:
             file.write(coords_message)
+
+        fetchSolarIrradiance(latitude, longitude)
+
 
         return render_template(
             'location.html',
