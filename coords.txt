@@ -1,1 +1,0 @@
-Latitude: 100, Longitude: 999
