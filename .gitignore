@@ -1,3 +1,5 @@
 coords.txt
 pv_config.txt
 solar_radiation_data.csv
+.cache.sqlite
+__pycache__/
