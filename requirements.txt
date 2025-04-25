@@ -2,8 +2,9 @@
 # use the following command in terminal:
 # pip install -r requirements.txt
 
+flask
 openmeteo-requests
 requests-cache
+pandas
 retry-requests
 numpy
-pandas
