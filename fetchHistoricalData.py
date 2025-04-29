@@ -58,9 +58,9 @@ def fetchHistoricalData(latitude, longitude, start_date, end_date):
     hourly_dataframe = pd.DataFrame(data=hourly_data)
     print(hourly_dataframe)
 
-#   Save the historical data to a CSV file
-#    hourly_dataframe.to_csv("historical_weather_data.csv", index=False)
-#    print("Data saved to 'historical_weather_data.csv'.")
+    # Save the historical data to a CSV file
+    # hourly_dataframe.to_csv("historical_weather_data.csv", index=False)
+    # print("Data saved to 'historical_weather_data.csv'.")
     
     return hourly_dataframe  # Return the DataFrame with the data
 
