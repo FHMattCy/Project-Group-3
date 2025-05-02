@@ -94,5 +94,5 @@ def submit_pv():
     return jsonify({"message": "PV system configuration saved successfully."})
 
 if __name__ == '__main__':
-    print("✅ Starting Flask app...")
+    print("Starting Flask app...")
     app.run(debug=True)
