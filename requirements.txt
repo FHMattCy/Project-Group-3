@@ -1,0 +1,10 @@
+# In order to install necessary libraries to use the fetchHistoricalData and fetchSolarIrradiance APIs,
+# use the following command in terminal:
+# pip install -r requirements.txt
+
+flask
+openmeteo-requests
+requests-cache
+pandas
+retry-requests
+numpy
