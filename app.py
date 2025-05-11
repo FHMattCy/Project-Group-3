@@ -33,18 +33,26 @@ def predict_location():
         "message": "Location received and saved to coords.txt"
     })
 
+# Entering Location manually linked to /location.html
 @app.route('/location', methods=['GET', 'POST'])
 def enter_location():
     if request.method == 'POST':
         latitude = request.form.get('latitude')
         longitude = request.form.get('longitude')
 
+        # Error preventing empty input.
         if not latitude or not longitude:
             return render_template(
                 'location.html',
                 error="Please enter both latitude and longitude.",
                 latitude=latitude,
                 longitude=longitude
+            )
+        # Error preventing out of range input.
+        elif not (-90 <= int(latitude) <= 90) or not (-180 <= int(longitude) <= 180):
+            return render_template(
+                'location.html',
+                error="Please input number between -90 to 90 for latitude and -180 to 180 for longitude."
             )
 
         coords_message = f"Latitude: {latitude}, Longitude: {longitude}\n"
