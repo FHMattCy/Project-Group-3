@@ -1,11 +1,13 @@
 const apiKey = '78de0611a6abb6e3bae85ee67bacdc62'; // Replace with your OpenWeatherMap API key
 
+//Latitude and Longtitude input.
 document.getElementById('location-form').addEventListener('submit', function(event) {
     event.preventDefault();
 
     const city = document.getElementById('city').value;
     const country = document.getElementById('country').value;
 
+    //Fetching Latitude and Longtitude from API.
     fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city},${country}&appid=${apiKey}`)
         .then(response => response.json())
         .then(data => {
@@ -51,25 +53,49 @@ function sendToBackend(latitude, longitude) {
 document.getElementById('pv-form').addEventListener('submit', function (e) {
     e.preventDefault();
 
+    // Constants
     const area = parseFloat(document.getElementById('area').value);
     const panelEff = parseFloat(document.getElementById('panel-eff').value);
     const inverterEff = parseFloat(document.getElementById('inverter-eff').value);
 
-    fetch('/submit_pv', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            area: area,
-            panel_efficiency: panelEff,
-            inverter_efficiency: inverterEff
-        })
-    })
-    .then(res => res.json())
-    .then(data => {
-        document.getElementById('response-message').innerText = data.message;
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        document.getElementById('response-message').innerText = 'An error occurred.';
-    });
+    // Range Check functions
+    //Regular range check functions.
+    function between(x, min, max) {
+        return x >= min && x <= max;
+    }
+    //Area range check function.
+    function areaBetween(x, min) {
+        return x >= min;
+    }
+
+    // Try to look for an invalid values.
+    try {
+        if (between(area, 0.01 || panelEff, 0.01, 1 || inverterEff, 0.01, 1) == false) throw "invalid value(s).";
+    // Catch and show error.
+    } catch(err) {
+        document.getElementById('response-message').innerText = 'Input is ' + err;
+    // finally run the code.
+    } finally {
+        // checks if all values are in range.
+        if (areaBetween(area, 0.01) == true || between(panelEff, 0.01, 1 || inverterEff, 0.01, 1) == true) {
+            //Summit form if all values are in range.
+            fetch('/submit_pv', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    area: area,
+                    panel_efficiency: panelEff,
+                    inverter_efficiency: inverterEff
+                    })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById('response-message').innerText = data.message;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('response-message').innerText = 'An error occurred.';
+                });
+        }
+    }
 });
