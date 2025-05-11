@@ -8,7 +8,8 @@ coords_file = os.path.join(os.getcwd(), 'coords.txt')
 
 @app.route('/')
 def index():
-    # หน้า index ที่ให้กรอก city กับ country
+    # TH - หน้า index ที่ให้กรอก city กับ country
+    # EN - Index page where you enter city and country.
     return render_template('index.html')
 
 @app.route('/predict', methods=['POST'])
@@ -61,18 +62,20 @@ def enter_location():
         )
 
 
-    # Method GET — ลองอ่าน coords.txt ถ้ามี
+    # TH - Method GET — ลองอ่าน coords.txt ถ้ามี
+    # EN - Method GET — Try to read coords.txt if there is one.
     lat, lon = None, None
     if os.path.exists(coords_file):
         with open(coords_file, 'r') as file:
             content = file.read().strip()
             try:
-                # แยกพิกัดจากข้อความในไฟล์
+                # TH - แยกพิกัดจากข้อความในไฟล์
+                # EN - Separate cords. from text in file.
                 parts = content.replace("Latitude: ", "").replace("Longitude: ", "").split(',')
                 lat = parts[0].strip()
                 lon = parts[1].strip()
             except IndexError:
-                pass  # ถ้าอ่านไม่ได้ก็ไม่ต้องแสดง
+                pass  # TH - ถ้าอ่านไม่ได้ก็ไม่ต้องแสดง EN - Won't display if cannot read file.
 
     return render_template('location.html', latitude=lat, longitude=lon)
 
