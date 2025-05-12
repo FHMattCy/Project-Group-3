@@ -3,6 +3,7 @@ import requests_cache
 import pandas as pd
 from retry_requests import retry
 
+# format of start_date and end_date is "YYYY-MM-DD"
 def fetchHistoricalData(latitude, longitude, start_date, end_date):
 
     # Setup the Open-Meteo API client with cache and retry on error
@@ -17,7 +18,7 @@ def fetchHistoricalData(latitude, longitude, start_date, end_date):
         "longitude": longitude,
         "start_date": start_date,
         "end_date": end_date,
-        "hourly": ["temperature_2m", "rain", "snowfall", "cloud_cover", "relative_humidity_2m", "wind_speed_10m", "apparent_temperature"]
+        "hourly": ["temperature_2m", "rain", "snowfall", "cloud_cover", "relative_humidity_2m", "wind_speed_10m", "apparent_temperature", "shortwave_radiation"]
     }
     
     responses = openmeteo.weather_api(url, params=params)
@@ -38,6 +39,7 @@ def fetchHistoricalData(latitude, longitude, start_date, end_date):
     hourly_relative_humidity_2m = hourly.Variables(4).ValuesAsNumpy()
     hourly_wind_speed_10m = hourly.Variables(5).ValuesAsNumpy()
     hourly_apparent_temperature = hourly.Variables(6).ValuesAsNumpy()
+    hourly_shortwave_radiation = hourly.Variables(7).ValuesAsNumpy()
 
     hourly_data = {
         "date": pd.date_range(
@@ -52,7 +54,9 @@ def fetchHistoricalData(latitude, longitude, start_date, end_date):
         "cloud_cover": hourly_cloud_cover,
         "relative_humidity_2m": hourly_relative_humidity_2m,
         "wind_speed_10m": hourly_wind_speed_10m,
-        "apparent_temperature": hourly_apparent_temperature
+        "apparent_temperature": hourly_apparent_temperature,
+        "shortwave_radiation" : hourly_shortwave_radiation
+
     }
 
     hourly_dataframe = pd.DataFrame(data=hourly_data)

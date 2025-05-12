@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, jsonify
 import os
 from fetchSolarIrradiance import fetchSolarIrradiance
+from fetchHistoricalData import fetchHistoricalData
 
 app = Flask(__name__)
 
@@ -25,6 +26,7 @@ def predict_location():
         file.write(coords_message)
 
     fetchSolarIrradiance(latitude, longitude)
+    #fetchHistoricalData(latitude, longitude, "2025-05-09", "2025-05-10")
 
     return jsonify({
         "latitude": latitude,
@@ -51,7 +53,6 @@ def enter_location():
             file.write(coords_message)
 
         fetchSolarIrradiance(latitude, longitude)
-
 
         return render_template(
             'location.html',
