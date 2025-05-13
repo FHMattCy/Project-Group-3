@@ -27,7 +27,7 @@ def predict_location():
 
     fetchSolarIrradiance(latitude, longitude)
     calculate_energy_output_prediction()
-
+    
     return jsonify({
         "latitude": latitude,
         "longitude": longitude,
