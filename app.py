@@ -9,7 +9,8 @@ coords_file = os.path.join(os.getcwd(), 'coords.txt')
 
 @app.route('/')
 def index():
-    # หน้า index ที่ให้กรอก city กับ country
+    # TH - หน้า index ที่ให้กรอก city กับ country
+    # EN - Index page where you enter city and country.
     return render_template('index.html')
 
 @app.route('/predict', methods=['POST'])
@@ -34,18 +35,26 @@ def predict_location():
         "message": "Location received and saved to coords.txt"
     })
 
+# Entering Location manually linked to /location.html
 @app.route('/location', methods=['GET', 'POST'])
 def enter_location():
     if request.method == 'POST':
         latitude = request.form.get('latitude')
         longitude = request.form.get('longitude')
 
+        # Error preventing empty input.
         if not latitude or not longitude:
             return render_template(
                 'location.html',
                 error="Please enter both latitude and longitude.",
                 latitude=latitude,
                 longitude=longitude
+            )
+        # Error preventing out of range input.
+        elif not (-90 <= int(latitude) <= 90) or not (-180 <= int(longitude) <= 180):
+            return render_template(
+                'location.html',
+                error="Please input number between -90 to 90 for latitude and -180 to 180 for longitude."
             )
 
         coords_message = f"Latitude: {latitude}, Longitude: {longitude}\n"
@@ -63,18 +72,20 @@ def enter_location():
         )
 
 
-    # Method GET — ลองอ่าน coords.txt ถ้ามี
+    # TH - Method GET — ลองอ่าน coords.txt ถ้ามี
+    # EN - Method GET — Try to read coords.txt if there is one.
     lat, lon = None, None
     if os.path.exists(coords_file):
         with open(coords_file, 'r') as file:
             content = file.read().strip()
             try:
-                # แยกพิกัดจากข้อความในไฟล์
+                # TH - แยกพิกัดจากข้อความในไฟล์
+                # EN - Separate cords. from text in file.
                 parts = content.replace("Latitude: ", "").replace("Longitude: ", "").split(',')
                 lat = parts[0].strip()
                 lon = parts[1].strip()
             except IndexError:
-                pass  # ถ้าอ่านไม่ได้ก็ไม่ต้องแสดง
+                pass  # TH - ถ้าอ่านไม่ได้ก็ไม่ต้องแสดง EN - Won't display if cannot read file.
 
     return render_template('location.html', latitude=lat, longitude=lon)
 
@@ -96,5 +107,5 @@ def submit_pv():
     return jsonify({"message": "PV system configuration saved successfully."})
 
 if __name__ == '__main__':
-    print("✅ Starting Flask app...")
+    print("Starting Flask app...")
     app.run(debug=True)
