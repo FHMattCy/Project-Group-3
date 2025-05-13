@@ -1,6 +1,7 @@
-from flask import Flask, render_template, request, jsonify
 import os
+from flask import Flask, render_template, request, jsonify
 from fetchSolarIrradiance import fetchSolarIrradiance
+from calculateEnergyOutput import calculate_energy_output_prediction
 
 app = Flask(__name__)
 
@@ -25,6 +26,7 @@ def predict_location():
         file.write(coords_message)
 
     fetchSolarIrradiance(latitude, longitude)
+    calculate_energy_output_prediction()
     
     return jsonify({
         "latitude": latitude,
@@ -51,6 +53,7 @@ def enter_location():
             file.write(coords_message)
 
         fetchSolarIrradiance(latitude, longitude)
+        calculate_energy_output_prediction()
 
         return render_template(
             'location.html',
@@ -86,7 +89,7 @@ def submit_pv():
 
     # Write PV system configuration to file
     with open('pv_config.txt', 'w', encoding='utf-8') as f:
-        f.write(f"Panel Area: {area} m²\n")
+        f.write(f"Panel Area: {area}\n")
         f.write(f"Panel Efficiency: {panel_eff}\n")
         f.write(f"Inverter Efficiency: {inverter_eff}\n")
 
