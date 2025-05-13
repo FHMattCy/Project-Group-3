@@ -16,7 +16,11 @@
         <label for="country">Country:</label>
         <input type="text" id="country" name="country" required><br><br>
 
-        <button type="submit">Get Latitude & Longitude</button>
+        <button type="button">Get Latitude & Longitude</button>
+
+        <br><br>
+
+        <button type="submit" id="use-device-location">Use Device Location</button>
     </form>
 
     <h4>Latitude: <span id="latitude"></span></h4>
@@ -45,6 +49,6 @@
 
     <p id="response-message"></p>
 
-    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script type="module" src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 </html>
