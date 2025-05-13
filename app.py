@@ -25,7 +25,7 @@ def predict_location():
         file.write(coords_message)
 
     fetchSolarIrradiance(latitude, longitude)
-
+    
     return jsonify({
         "latitude": latitude,
         "longitude": longitude,
@@ -51,7 +51,6 @@ def enter_location():
             file.write(coords_message)
 
         fetchSolarIrradiance(latitude, longitude)
-
 
         return render_template(
             'location.html',
