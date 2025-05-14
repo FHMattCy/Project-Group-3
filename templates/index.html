@@ -16,6 +16,7 @@
         <label for="country">Country:</label>
         <input type="text" id="country" name="country" required><br><br>
 
+        <!--Submit Button-->
         <button type="submit">Get Latitude & Longitude</button>
     </form>
 
@@ -40,11 +41,26 @@
         <label>Inverter Efficiency (0-1):</label>
         <input type="number" step="0.01" id="inverter-eff" required><br><br>
 
+        <!--Submit Button-->
         <button type="submit">Submit</button>
     </form>
 
     <p id="response-message"></p>
 
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+    <h3>Solar Radiation Forecast</h3>
+    <table border="1" id="radiation-table">
+        <thead>
+            <tr>
+                <th>Date & Time (UTC)</th>
+                <th>Radiation (W/m²)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Data will be inserted here by JavaScript -->
+        </tbody>
+    </table>
+
 </body>
 </html>

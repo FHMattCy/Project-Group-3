@@ -1,6 +1,9 @@
+import os
+import pandas as pd
 from flask import Flask, render_template, request, jsonify
 import os
 from fetchSolarIrradiance import fetchSolarIrradiance
+from flask import send_file
 
 app = Flask(__name__)
 
@@ -59,8 +62,8 @@ def enter_location():
             longitude_display=longitude
         )
 
-
-    # Method GET — ลองอ่าน coords.txt ถ้ามี
+    # TH - Method GET — ลองอ่าน coords.txt ถ้ามี
+    # EN - Method GET — Try to read coords.txt if there is one.
     lat, lon = None, None
     if os.path.exists(coords_file):
         with open(coords_file, 'r') as file:
@@ -92,6 +95,29 @@ def submit_pv():
 
     return jsonify({"message": "PV system configuration saved successfully."})
 
+@app.route('/solar_radiation_data.csv')
+def get_csv():
+    filepath = r"C:\VS Code projects2\ProjectGroup3Coords\solar_radiation_data.csv"
+    if os.path.exists(filepath):
+        return send_file(filepath, mimetype='text/csv')
+    else:
+        return "CSV file not found", 404
+
+@app.route('/radiation_data')
+def get_radiation_data():
+    try:
+        df = pd.read_csv("solar_radiation_data.csv")
+
+        # convert datetime into string as "YYYY-MM-DD HH:MM"
+        df['date'] = pd.to_datetime(df['date']).dt.strftime("%Y-%m-%d %H:%M")
+
+        # convert into the list of dict
+        data = df.to_dict(orient='records')
+
+        return jsonify(data)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
 if __name__ == '__main__':
-    print("✅ Starting Flask app...")
+    print("Starting Flask app...")
     app.run(debug=True)
