@@ -97,7 +97,7 @@ def submit_pv():
 
 @app.route('/solar_radiation_data.csv')
 def get_csv():
-    filepath = r"C:\VS Code projects2\ProjectGroup3Coords\solar_radiation_data.csv"
+    filepath = os.path.join(os.getcwd(), 'solar_radiation_data.csv')
     if os.path.exists(filepath):
         return send_file(filepath, mimetype='text/csv')
     else:
@@ -121,3 +121,4 @@ def get_radiation_data():
 if __name__ == '__main__':
     print("Starting Flask app...")
     app.run(debug=True)
+
