@@ -23,6 +23,10 @@
 
         <!--Submit Button-->>
         <button type="submit">Get Latitude & Longitude</button>
+
+        <br><br>
+
+        <button type="button" id="use-device-location">Use Device Location</button>
     </form>
 
     <!--Result Display-->
@@ -58,6 +62,6 @@
 
     <p id="response-message"></p>
 
-    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script type="module" src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 </html>

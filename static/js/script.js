@@ -1,3 +1,5 @@
+import './fetchDeviceGeolocation.js';  // Import the file with the browser geolocation api code
+
 const apiKey = '78de0611a6abb6e3bae85ee67bacdc62'; // Replace with your OpenWeatherMap API key
 
 //Latitude and Longtitude input.
