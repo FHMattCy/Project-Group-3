@@ -67,7 +67,6 @@ document.getElementById('pv-form').addEventListener('submit', function (e) {
         return;
     }
 
-            }
     // Submit only if valid
     fetch('/submit_pv', {
         method: 'POST',
