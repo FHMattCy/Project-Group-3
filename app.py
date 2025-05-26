@@ -2,7 +2,6 @@ import os
 import pandas as pd
 import csv
 from flask import Flask, render_template, request, jsonify, send_file
-from flask import send_from_directory
 from fetchSolarIrradiance import fetchSolarIrradiance
 from calculateEnergyOutput import calculate_energy_output_prediction
 
