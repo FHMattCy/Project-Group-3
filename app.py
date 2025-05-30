@@ -24,16 +24,14 @@ def predict_location():
     if latitude is None or longitude is None:
         return jsonify({"error": "Latitude and longitude are required"}), 400
 
-    coords_message = f"Latitude: {latitude}, Longitude: {longitude}\n"
     with open(coords_file, 'w') as file:
-        file.write(coords_message)
+        file.write(f"Latitude: {latitude}, Longitude: {longitude}\n")
 
     fetchSolarIrradiance(latitude, longitude)
     hourly_predictions = calculate_energy_output_prediction()
 
     # Ensure the directory exists
     os.makedirs(os.path.join('Project-Group-3', 'Data'), exist_ok=True)
-
     # Save predictions to HourOrderAndEstimated.csv 
     output_path = os.path.join('Project-Group-3','Data', 'HourOrderAndEstimated.csv')
     with open(output_path, 'w', newline='', encoding='utf-8') as file:
@@ -41,24 +39,8 @@ def predict_location():
         writer.writerow(['Hour', 'Estimated Energy'])  # kWh
         for hour, value in enumerate(hourly_predictions, start=1):
             writer.writerow([hour, round(value, 4)])
-    # Read PV config
-    try:
-        with open('pv_config.txt', 'r', encoding='utf-8') as f:
-            lines = f.readlines()
-            A = float(lines[0].split(':')[1].strip().split()[0])
-            n_pv = float(lines[1].split(':')[1].strip())
-            n_inv = float(lines[2].split(':')[1].strip())
-    except Exception as e:
-        return jsonify({"error": f"Failed to read PV config: {str(e)}"}), 500
 
-    return jsonify({
-        "message": "Prediction completed successfully.",
-        "latitude": latitude,
-        "longitude": longitude,
-        "panel_area": A,
-        "panel_efficiency": n_pv,
-        "inverter_efficiency": n_inv
-    }), 200
+    return jsonify({"message": "Prediction completed successfully."}), 200
 
 #Route for getting latitude and lonitude by manual
 @app.route('/location', methods=['GET', 'POST'])
