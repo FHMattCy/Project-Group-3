@@ -66,9 +66,8 @@ def _calculate_power_output(G, A, n_pv, n_inv):
     P = G * A * n_pv * n_inv
     return P
 
-#Formula for calculate Estimated Output
 def _calculate_energy_output(P, hours):
-
+  
     """
     Calculate the total energy output over a period of time.
 

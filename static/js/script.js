@@ -1,3 +1,5 @@
+import './fetchDeviceGeolocation.js';  // Import the file with the browser geolocation api code
+
 const apiKey = '78de0611a6abb6e3bae85ee67bacdc62'; // Replace with your OpenWeatherMap API key
 
 // Input City and Country for latitude and lonitude
@@ -7,6 +9,7 @@ document.getElementById('location-form').addEventListener('submit', function(eve
     const city = document.getElementById('city').value;
     const country = document.getElementById('country').value;
 
+    //Fetching Latitude and Longtitude from API.
     fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city},${country}&appid=${apiKey}`)
         .then(response => response.json())
         .then(data => {
@@ -55,6 +58,7 @@ function sendToBackend(latitude, longitude) {
 document.getElementById('pv-form').addEventListener('submit', function (e) {
     e.preventDefault();
 
+    // Constants
     const area = parseFloat(document.getElementById('area').value);
     const panelEff = parseFloat(document.getElementById('panel-eff').value);
     const inverterEff = parseFloat(document.getElementById('inverter-eff').value);

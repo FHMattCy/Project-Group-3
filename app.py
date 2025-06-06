@@ -12,6 +12,8 @@ coords_file = os.path.join(os.getcwd(), 'coords.txt')
 #main page
 @app.route('/')
 def index():
+    # TH - หน้า index ที่ให้กรอก city กับ country
+    # EN - Index page where you enter city and country.
     return render_template('index.html')
 
 #Route for getting latitude and lonitude by input city and country name
@@ -43,12 +45,15 @@ def predict_location():
     return jsonify({"message": "Prediction completed successfully."}), 200
 
 #Route for getting latitude and lonitude by manual
+# Entering Location manually linked to /location.html
+
 @app.route('/location', methods=['GET', 'POST'])
 def enter_location():
     if request.method == 'POST':
         latitude = request.form.get('latitude')
         longitude = request.form.get('longitude')
 
+        # Error preventing empty input.
         if not latitude or not longitude:
             return render_template(
                 'location.html',
@@ -56,12 +61,19 @@ def enter_location():
                 latitude=latitude,
                 longitude=longitude
             )
+        # Error preventing out of range input.
+        elif not (-90 <= int(latitude) <= 90) or not (-180 <= int(longitude) <= 180):
+            return render_template(
+                'location.html',
+                error="Please input number between -90 to 90 for latitude and -180 to 180 for longitude."
+            )
 
         coords_message = f"Latitude: {latitude}, Longitude: {longitude}\n"
         with open(coords_file, 'w') as file:
             file.write(coords_message)
 
         fetchSolarIrradiance(latitude, longitude)
+        calculate_energy_output_prediction()
 
         return render_template(
             'location.html',
@@ -77,12 +89,15 @@ def enter_location():
         with open(coords_file, 'r') as file:
             content = file.read().strip()
             try:
-                # split latitude and longitude
+
+                # TH - แยกพิกัดจากข้อความในไฟล์
+                # EN - Separate cords. from text in file.
+
                 parts = content.replace("Latitude: ", "").replace("Longitude: ", "").split(',')
                 lat = parts[0].strip()
                 lon = parts[1].strip()
             except IndexError:
-                pass  # if impossible to so read does't have to show
+                pass  # TH - ถ้าอ่านไม่ได้ก็ไม่ต้องแสดง EN - Won't display if cannot read file.
 
     return render_template('location.html', latitude=lat, longitude=lon)
 
@@ -97,7 +112,7 @@ def submit_pv():
 
     # Write PV system configuration to file
     with open('pv_config.txt', 'w', encoding='utf-8') as f:
-        f.write(f"Panel Area: {area} m²\n")
+        f.write(f"Panel Area: {area}\n")
         f.write(f"Panel Efficiency: {panel_eff}\n")
         f.write(f"Inverter Efficiency: {inverter_eff}\n")
 
