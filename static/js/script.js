@@ -54,6 +54,40 @@ function sendToBackend(latitude, longitude) {
     });
 }
 
+document.getElementById('time-period-form').addEventListener('submit', async function(event) {
+    event.preventDefault(); // no reloading the page
+
+    const startDateTime = document.getElementById('start-date-time').value;
+    const endDateTime = document.getElementById('end-date-time').value;
+
+    // validate inputs here before sending
+
+    // send data to backend using fetch POST request
+    try {
+        const response = await fetch('/fetch-solar-irradiance', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                start_date_time: startDateTime,
+                end_date_time: endDateTime
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        console.log('Response from backend:', data);
+
+        // Optionally update UI with data from backend here
+
+    } catch (error) {
+        console.error('Error sending data:', error);
+    }
+});
+
 // PV system form submission
 document.getElementById('pv-form').addEventListener('submit', function (e) {
     e.preventDefault();
@@ -190,7 +224,7 @@ document.getElementById('pv-form').addEventListener('submit', function (e) {
 
     // Estimated Output data
     function loadPredictionPeriodTable() {
-        fetch('/solar_radiation_data.csv')
+        fetch('/Data/solar_radiation_data.csv')
             .then(response => response.text())
             .then(csvText => {
                 const rows = csvText.trim().split('\n').slice(1); // skip header

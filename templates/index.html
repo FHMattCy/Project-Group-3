@@ -39,6 +39,20 @@
 
     <br><hr><br>
 
+    <form id="time-period-form">
+
+        <label for="start-date-time">Start Date & Time:</label>
+        <input type="datetime-local" id="start-date-time" name="start_date_time"><br><br>
+
+        <label for="end-date-time">End Date & Time:</label>
+        <input type="datetime-local" id="end-date-time" name="end_date_time"><br><br>
+
+        <button type="submit">Submit</button>
+
+    </form>
+
+    <br><hr><br>
+
     <!-- Second form: PV System Configuration -->
     <h3>Enter Your PV System Details</h3>
 
@@ -62,7 +76,7 @@
 
     <p id="response-message"></p>
   
-    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script type="module" src="{{ url_for('static', filename='js/script.js') }}"></script>
 
     <h3>Power Prediction</h3>
     <table id="energy-table">
