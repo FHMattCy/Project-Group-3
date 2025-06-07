@@ -72,14 +72,9 @@ document.getElementById('pv-form').addEventListener('submit', function (e) {
 
     // Try to look for an invalid values.
     try {
-        if (areaBetween(area, 0.01) == false && between(panelEff, 0.01, 1) == false && between(inverterEff, 0.01, 1) == false) throw "invalid value(s)."; //Note: Temporary fixes, It prevents invalid values from being saved to file, but only show error when area input box is given invalid input and not other boxes.
-    // Catch and show error.
-    } catch(err) {
-        document.getElementById('response-message').innerText = 'Input is ' + err;
-    // finally run the code.
-    } finally {
-        // checks if all values are in range.
-        if (areaBetween(area, 0.01) == true && between(panelEff, 0.01, 1) == true && between(inverterEff, 0.01, 1) == true) { // Redundent, but when I removed it while testing, it stop preventing invalid input from being saved to file.
+        if (!areaBetween(area, 0.01) && !between(panelEff, 0.01, 1) && !between(inverterEff, 0.01, 1)) throw "invalid value(s)."; //Check for values out of bounds then throw an error.
+
+        if (areaBetween(area, 0.01) && between(panelEff, 0.01, 1) && between(inverterEff, 0.01, 1)) {
             //Summit form if all values are in range.
             fetch('/submit_pv', {
                 method: 'POST',
@@ -99,5 +94,9 @@ document.getElementById('pv-form').addEventListener('submit', function (e) {
                     document.getElementById('response-message').innerText = 'An error occurred.';
                 });
         }
+    // Catch and show error.
+    } catch(error) {
+        console.error('Error:', error)
+        document.getElementById('response-message').innerText = 'Input is ' + error;
     }
 });
