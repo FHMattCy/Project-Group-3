@@ -3,7 +3,7 @@ import './fetchDeviceGeolocation.js';  // Import the file with the browser geolo
 const apiKey = '78de0611a6abb6e3bae85ee67bacdc62'; // Replace with your OpenWeatherMap API key
 
 // Input City and Country for latitude and lonitude
-document.getElementById('location-form').addEventListener('submit', function(event) {
+document.getElementById('location-form').addEventListener('submit', function (event) {
     event.preventDefault();
 
     const city = document.getElementById('city').value;
@@ -42,53 +42,76 @@ function sendToBackend(latitude, longitude) {
             longitude: longitude
         })
     })
-    .then(response => response.json())
-    .then(data => {
-        console.log("Data received from backend:", data);
-        // Loading new table after getting new cordinates
-        loadPredictionPeriodTable();  
-        loadEstimatedOutputTable();
-    })
-    .catch(error => {
-        console.error("Error sending data to backend:", error);
-    });
+        .then(response => response.json())
+        .then(data => {
+            console.log("Data received from backend:", data);
+            // Loading new table after getting new cordinates
+            loadPredictionPeriodTable();
+            loadEstimatedOutputTable();
+        })
+        .catch(error => {
+            console.error("Error sending data to backend:", error);
+        });
 }
 
-document.getElementById('time-period-form').addEventListener('submit', async function(event) {
-    event.preventDefault(); // no reloading the page
+document.getElementById('time-period-form').addEventListener('submit', async function (event) {
+    event.preventDefault();
 
-    const startDateTime = document.getElementById('start-date-time').value;
-    const endDateTime = document.getElementById('end-date-time').value;
+    const warningElement = document.getElementById('time-period-form-warning');
+    warningElement.textContent = '';
 
-    // validate inputs here before sending
+    const startDateTimeStr = document.getElementById('start-date-time').value;
+    const endDateTimeStr = document.getElementById('end-date-time').value;
 
-    // send data to backend using fetch POST request
+    const startDateTime = new Date(startDateTimeStr);
+    const endDateTime = new Date(endDateTimeStr);
+    const now = new Date();
+    const maxEndTime = new Date();
+    maxEndTime.setDate(now.getDate() + 16);
+
+    if (isNaN(startDateTime.getTime()) || isNaN(endDateTime.getTime())) {
+        warningElement.textContent = 'Please enter both start and end date/time.';
+        return;
+    }
+
+    if (startDateTime >= endDateTime) {
+        warningElement.textContent = 'Start date & time must be before end date & time.';
+        return;
+    }
+
+    const oneHourMs = 60 * 60 * 1000;
+    if ((endDateTime - startDateTime) < oneHourMs) {
+        warningElement.textContent = 'There must be at least a 1 hour difference between start and end times.';
+        return;
+    }
+
+    if (endDateTime > maxEndTime) {
+        warningElement.textContent = 'End date & time cannot be more than 16 days from today.';
+        return;
+    }
+
+    // Proceed to fetch since validation passed...
     try {
-        const response = await fetch('/fetch-solar-irradiance', {
+        const response = await fetch('/test_fetch', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                start_date_time: startDateTime,
-                end_date_time: endDateTime
-            })
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ start_datetime: startDateTimeStr, end_datetime: endDateTimeStr })
         });
 
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
         const data = await response.json();
-        console.log('Response from backend:', data);
 
-        // Optionally update UI with data from backend here
-
+        if (data.error) {
+            warningElement.textContent = data.reason;
+        } else {
+            console.log('Response:', data);
+        }
     } catch (error) {
-        console.error('Error sending data:', error);
+        warningElement.textContent = 'Error sending data: ' + error.message;
+        console.error('Error:', error);
     }
-});
+  });
 
-// PV system form submission
+  // PV system form submission
 document.getElementById('pv-form').addEventListener('submit', function (e) {
     e.preventDefault();
 
@@ -115,70 +138,70 @@ document.getElementById('pv-form').addEventListener('submit', function (e) {
             inverter_efficiency: inverterEff
         })
     })
-    .then(res => res.json())
-    .then(data => {
-        document.getElementById('response-message').innerText = data.message;
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById('response-message').innerText = data.message;
 
-        // Get current lat/lon shown on page
-        const lat = document.getElementById('latitude').textContent;
-        const lon = document.getElementById('longitude').textContent;
+            // Get current lat/lon shown on page
+            const lat = document.getElementById('latitude').textContent;
+            const lon = document.getElementById('longitude').textContent;
 
-        // Recalculate
-        fetch('/predict', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ latitude: lat, longitude: lon })
-        })
-        .then(response => response.json())
-        .then(predictData => {
-            console.log("Prediction after PV config update:", predictData);
+            // Recalculate
+            fetch('/predict', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ latitude: lat, longitude: lon })
+            })
+                .then(response => response.json())
+                .then(predictData => {
+                    console.log("Prediction after PV config update:", predictData);
 
-            // Reload updated tables
-            loadPredictionPeriodTable();
-            loadEstimatedOutputTable();
-        })
-        .catch(error => {
-            console.error("Error after PV config update:", error);
+                    // Reload updated tables
+                    loadPredictionPeriodTable();
+                    loadEstimatedOutputTable();
+                })
+                .catch(error => {
+                    console.error("Error after PV config update:", error);
+                });
         });
-    });
 });
 
 
-    // Prepare to save Estimated Outout in the table
-    fetch('/energy_data')
-            .then(response => response.json())
-            .then(data => {
-                let tbody = document.querySelector('#energy-table tbody');
-                let total = 0;
+// Prepare to save Estimated Outout in the table
+fetch('/energy_data')
+    .then(response => response.json())
+    .then(data => {
+        let tbody = document.querySelector('#energy-table tbody');
+        let total = 0;
 
-                // Function that transfer hour into "HH:00-HH+1:00"
-                function hourToPeriod(hour) {
-                    let start = (hour + 21) % 24; // shift to 22:00 = hour 1
-                    let end = (start + 1) % 24;
-                    return `${String(start).padStart(2, '0')}:00-${String(end).padStart(2, '0')}:00`;
-                }
+        // Function that transfer hour into "HH:00-HH+1:00"
+        function hourToPeriod(hour) {
+            let start = (hour + 21) % 24; // shift to 22:00 = hour 1
+            let end = (start + 1) % 24;
+            return `${String(start).padStart(2, '0')}:00-${String(end).padStart(2, '0')}:00`;
+        }
 
-                data.forEach(row => {
-                    const energyWh = row['Estimated_Energy'];
-                    const energyKWh = energyWh / 1000;
-                    total += energyKWh;
+        data.forEach(row => {
+            const energyWh = row['Estimated_Energy'];
+            const energyKWh = energyWh / 1000;
+            total += energyKWh;
 
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
                         <td>${hourToPeriod(row['Hour'])}</td>
                         <td>${energyKWh.toFixed(2)}</td>
                     `;
-                    tbody.appendChild(tr);
-                });
+            tbody.appendChild(tr);
+        });
 
-                document.getElementById('total-energy').innerHTML = `<strong>${total.toFixed(2)}</strong>`;
-            })
-            .catch(error => {
-                console.error("Failed to load energy data:", error);
-            });
+        document.getElementById('total-energy').innerHTML = `<strong>${total.toFixed(2)}</strong>`;
+    })
+    .catch(error => {
+        console.error("Failed to load energy data:", error);
+    });
 
 // Prediction Peroid
-    function loadEstimatedOutputTable() {
+function loadEstimatedOutputTable() {
     fetch('/HourOrderAndEstimated.csv')
         .then(response => response.text())
         .then(csvText => {
@@ -222,37 +245,37 @@ document.getElementById('pv-form').addEventListener('submit', function (e) {
         });
 }
 
-    // Estimated Output data
-    function loadPredictionPeriodTable() {
-        fetch('/Data/solar_radiation_data.csv')
-            .then(response => response.text())
-            .then(csvText => {
-                const rows = csvText.trim().split('\n').slice(1); // skip header
-                const tableBody = document.querySelector('#energy-table tbody');
-                tableBody.innerHTML = ''; // clear first
+// Estimated Output data
+function loadPredictionPeriodTable() {
+    fetch('/Data/solar_radiation_data.csv')
+        .then(response => response.text())
+        .then(csvText => {
+            const rows = csvText.trim().split('\n').slice(1); // skip header
+            const tableBody = document.querySelector('#energy-table tbody');
+            tableBody.innerHTML = ''; // clear first
 
-                rows.forEach((row) => {
-                    const [dateStr, radiation] = row.split(',');
+            rows.forEach((row) => {
+                const [dateStr, radiation] = row.split(',');
 
-                    // Split time from dateStr and transfer to form "HH:mm"
-                    // Example of dateStr: "2025-05-19 22:00:00+00:00"
-                    const timePart = dateStr.split(' ')[1];  // "22:00:00+00:00"
-                    const hourMin = timePart.substring(0, 5); // "22:00"
+                // Split time from dateStr and transfer to form "HH:mm"
+                // Example of dateStr: "2025-05-19 22:00:00+00:00"
+                const timePart = dateStr.split(' ')[1];  // "22:00:00+00:00"
+                const hourMin = timePart.substring(0, 5); // "22:00"
 
-                    const tr = document.createElement('tr');
+                const tr = document.createElement('tr');
 
-                    const timeCell = document.createElement('td');
-                    const radiationCell = document.createElement('td');
+                const timeCell = document.createElement('td');
+                const radiationCell = document.createElement('td');
 
-                    timeCell.textContent = hourMin;
-                    radiationCell.textContent = parseFloat(radiation).toFixed(2);
+                timeCell.textContent = hourMin;
+                radiationCell.textContent = parseFloat(radiation).toFixed(2);
 
-                    tr.appendChild(timeCell);
-                    tr.appendChild(radiationCell);
-                    tableBody.appendChild(tr);
-                });
+                tr.appendChild(timeCell);
+                tr.appendChild(radiationCell);
+                tableBody.appendChild(tr);
             });
-    }
+        });
+}
 
 window.addEventListener('load', () => {
     loadPredictionPeriodTable();

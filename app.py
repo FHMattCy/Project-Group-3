@@ -16,6 +16,34 @@ def index():
     # EN - Index page where you enter city and country.
     return render_template('index.html')
 
+# remove this route later, here only for testing
+@app.route('/test_fetch', methods=['GET', 'POST'])
+def test_fetch():
+    if request.method == 'POST':
+        data = request.get_json()  # read JSON payload
+        if not data:
+            return {"error": True, "reason": "No JSON data received"}, 400
+        
+        start = data.get('start_datetime')
+        end = data.get('end_datetime')
+
+        # Optional: validate start and end presence again here
+        if not start or not end:
+            return {"error": True, "reason": "Missing start or end datetime"}, 400
+
+        # Hardcoded lat/lon for testing
+        latitude = 13.7563   # Bangkok, for example
+        longitude = 100.5018
+
+        try:
+            fetchSolarIrradiance(latitude, longitude, start, end)
+            return {"error": False, "message": "Irradiance fetched and saved successfully!"}
+        except Exception as e:
+            return {"error": True, "reason": str(e)}, 500
+
+    return render_template('test_form.html')
+
+
 #Route for getting latitude and lonitude by input city and country name
 @app.route('/predict', methods=['POST'])
 def predict_location():

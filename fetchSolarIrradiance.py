@@ -51,7 +51,6 @@ def fetchSolarIrradiance(latitude, longitude, start_date_time, end_date_time):
     minutely_15_data["shortwave_radiation"] = minutely_15_shortwave_radiation
 
     minutely_15_dataframe = pd.DataFrame(data = minutely_15_data)
-    print(minutely_15_dataframe)
 
     # Process hourly data. The order of variables needs to be the same as requested.
     hourly = response.Hourly()
@@ -67,6 +66,23 @@ def fetchSolarIrradiance(latitude, longitude, start_date_time, end_date_time):
     hourly_data["shortwave_radiation"] = hourly_shortwave_radiation
 
     hourly_dataframe = pd.DataFrame(data = hourly_data)
+
+    # Convert start and end datetime strings to pandas Timestamps with UTC timezone
+    start_timestamp = pd.Timestamp(start_date_time).tz_localize('UTC')
+    end_timestamp = pd.Timestamp(end_date_time).tz_localize('UTC')
+
+    # Filter the dataframes to only include rows between start_ts and end_ts
+    minutely_15_dataframe = minutely_15_dataframe[
+        (minutely_15_dataframe['date'] >= start_timestamp) &
+        (minutely_15_dataframe['date'] <= end_timestamp)
+    ]
+
+    hourly_dataframe = hourly_dataframe[
+        (hourly_dataframe['date'] >= start_timestamp) &
+        (hourly_dataframe['date'] <= end_timestamp)
+    ]
+
+    print(minutely_15_dataframe)
     print(hourly_dataframe)
 
     #Create a folder name "Data"
@@ -79,6 +95,6 @@ def fetchSolarIrradiance(latitude, longitude, start_date_time, end_date_time):
     minutely_15_dataframe.to_csv(minutely_15_csv_path, index=False)
     hourly_csv_path = os.path.join(data_dir, "solar_radiation_data.csv")
     hourly_dataframe.to_csv(hourly_csv_path, index=False)
-    print(f"Solar radiation data saved to {csv_path}")
+    print(f"Solar radiation data saved")
 
     

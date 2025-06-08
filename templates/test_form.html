@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Solar Irradiance</title>
+    <style>
+        #time-period-form-warning {
+            color: red;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test Irradiance Fetch</h1>
+    <form id="time-period-form">
+        <label for="start-date-time">Start DateTime (ISO):</label>
+        <input type="text" id="start-date-time" name="start_datetime" placeholder="2025-06-01T00:00" ><br><br>
+
+        <label for="end-date-time">End DateTime (ISO):</label>
+        <input type="text" id="end-date-time" name="end_datetime" placeholder="2025-06-01T23:45" ><br><br>
+
+        <button type="submit">Submit</button>
+    </form>
+
+    <p id="time-period-form-warning"></p>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('time-period-form').addEventListener('submit', async function (event) {
+                event.preventDefault();
+
+                const warningElement = document.getElementById('time-period-form-warning');
+                warningElement.textContent = '';
+
+                const startDateTimeStr = document.getElementById('start-date-time').value;
+                const endDateTimeStr = document.getElementById('end-date-time').value;
+
+                const startDateTime = new Date(startDateTimeStr);
+                const endDateTime = new Date(endDateTimeStr);
+                const now = new Date();
+                const maxEndTime = new Date();
+                maxEndTime.setDate(now.getDate() + 16);
+
+                if (isNaN(startDateTime.getTime()) || isNaN(endDateTime.getTime())) {
+                    warningElement.textContent = 'Please enter both start and end date/time.';
+                    return;
+                }
+
+                if (startDateTime >= endDateTime) {
+                    warningElement.textContent = 'Start date & time must be before end date & time.';
+                    return;
+                }
+
+                const oneHourMs = 60 * 60 * 1000;
+                if ((endDateTime - startDateTime) < oneHourMs) {
+                    warningElement.textContent = 'There must be at least a 1 hour difference between start and end times.';
+                    return;
+                }
+
+                if (endDateTime > maxEndTime) {
+                    warningElement.textContent = 'End date & time cannot be more than 16 days from today.';
+                    return;
+                }
+
+                // Proceed to send data to server
+                try {
+                    const response = await fetch('/test_fetch', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            start_datetime: startDateTimeStr,
+                            end_datetime: endDateTimeStr
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (data.error) {
+                        warningElement.textContent = data.reason;
+                    } else {
+                        console.log('Response:', data);
+                        // Optionally clear warning or show success
+                        warningElement.textContent = 'Request successful!';
+                    }
+                } catch (error) {
+                    warningElement.textContent = 'Error sending data: ' + error.message;
+                    console.error('Error:', error);
+                }
+            });
+        });
+    </script>
+</body>
+</html>
