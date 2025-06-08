@@ -69,10 +69,21 @@ document.getElementById('time-period-form').addEventListener('submit', async fun
     const maxEndTime = new Date();
     maxEndTime.setDate(now.getDate() + 16);
 
-    if (isNaN(startDateTime.getTime()) || isNaN(endDateTime.getTime())) {
-        warningElement.textContent = 'Please enter both start and end date/time.';
-        return;
-    }
+    if (isNaN(startDateTime.getTime())) {
+        if (isNaN(endDateTime.getTime())) {
+            // Both are invalid
+            startDateTime = new Date(now);
+            endDateTime = new Date(now.getTime() + 24 * 60 * 60 * 1000); // now + 24h
+        } else {
+            // Only start is invalid
+            startDateTime = new Date(now);
+        }
+    } else {
+        if (isNaN(endDateTime.getTime())) {
+            // Only end is invalid
+            endDateTime = new Date(startDateTime.getTime() + 24 * 60 * 60 * 1000); // start + 24h
+        }
+}
 
     if (startDateTime >= endDateTime) {
         warningElement.textContent = 'Start date & time must be before end date & time.';
@@ -85,6 +96,7 @@ document.getElementById('time-period-form').addEventListener('submit', async fun
         return;
     }
 
+    // API is limited to 16 day forecast
     if (endDateTime > maxEndTime) {
         warningElement.textContent = 'End date & time cannot be more than 16 days from today.';
         return;
