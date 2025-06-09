@@ -1,51 +1,56 @@
 import csv
+import os
 
+#For reading solar_radiation_data.csv
 def calculate_energy_output_prediction():
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    csv_path = os.path.join(base_dir, "Data", "solar_radiation_data.csv")
     """
     Generate a prediction for energy produced by a PV system over a period of time.
-
-    PV settings are read from a file (pv_config.txt)
-    solar radiation is read from a file (solar_radiation_data_csv)
-        the expected granularity is per hour, so each entry represents one hour (timespan is CSV rows * hours)
-
-    Returns:
-    float: Total energy output in kilowatt-hours (kWh)
+    Prints cumulative energy output hour by hour.
+    Returns list of hourly energy outputs (not cumulative).
     """
-    
-    # get PV config
+    #Get PV config
     pv_data = []
-
     with open('pv_config.txt', 'r') as file:
         for line in file:
             parts = line.split(':')
-            if (len(parts) > 1):
-                value = float(parts[1].strip())
-                pv_data.append(value)
-    
+            if len(parts) > 1:
+                try:
+                    value = float(parts[1].strip().split()[0])
+                    pv_data.append(value)
+                except ValueError:
+                    print(f"Warning: Invalid value in line: {line.strip()}")
+
+    if len(pv_data) < 3:
+        raise ValueError("pv_config.txt Please input the value at least 1 value inverter")
+
     panel_area = pv_data[0]
     panel_efficiency = pv_data[1]
     converter_efficiency = pv_data[2]
 
-
-    # calculate prediction
-    energy_prediction = 0.0
-    ctr = 0
-    
-    with open('solar_radiation_data.csv', newline='') as csvfile:
+    hourly_energies = []
+    with open(csv_path, newline='') as csvfile:
         reader = csv.reader(csvfile)
-        for row in reader:
-            if (len(row) > 1) and ctr > 0:
-                print(row[1])
-                energy_prediction += _calculate_energy_output(_calculate_power_output(float(row[1].strip()), panel_area, panel_efficiency, converter_efficiency), 1)
-            ctr = ctr + 1
-    
-    
-    # log prediction to sonsole and return value
-    print(f"Prediction over {ctr - 1} hours: {energy_prediction:.2f} kWh") # ctr - 1 because the fist csv line is only text...
-    return energy_prediction
+        next(reader)  # skip header
 
+        for idx, row in enumerate(reader, start=1):
+            G = float(row[1].strip())
+            P = _calculate_power_output(G, panel_area, panel_efficiency, converter_efficiency)
+            E = _calculate_energy_output(P, 1)  # Wh
+            hourly_energies.append(E)
+            E_kWh = E / 1000  # transfer Wh into kWh
+            print(f"Hour {idx}: {E_kWh:.4f} kWh")
 
+    total_energy_wh = sum(hourly_energies)
+    total_energy_kwh = total_energy_wh / 1000
+    print(f"Total Estimated Energy: {total_energy_wh:.2f} Wh ({total_energy_kwh:.2f} kWh)")
+
+    return [e / 1000 for e in hourly_energies]
+
+#Formula for calculate Solar irradiance
 def _calculate_power_output(G, A, n_pv, n_inv):
+
     """
     Calculate the current power output from the solar system.
 
@@ -61,8 +66,8 @@ def _calculate_power_output(G, A, n_pv, n_inv):
     P = G * A * n_pv * n_inv
     return P
 
-
 def _calculate_energy_output(P, hours):
+  
     """
     Calculate the total energy output over a period of time.
 
@@ -73,5 +78,5 @@ def _calculate_energy_output(P, hours):
     Returns:
     float: Total energy output in kilowatt-hours (kWh)
     """
-    E = P * hours / 1000  # Convert from watt-hours to kilowatt-hours
+    E = P * hours # Convert from watt-hours to kilowatt-hours later in app.py
     return E
