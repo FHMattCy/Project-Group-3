@@ -137,7 +137,7 @@ document.getElementById('pv-form').addEventListener('submit', function (e) {
             console.error("Error after PV config update:", error);
         });
     });
-});
+};
 
     // Prepare to save Estimated Outout in the table
     fetch('/energy_data')
@@ -252,4 +252,4 @@ document.getElementById('pv-form').addEventListener('submit', function (e) {
 window.addEventListener('load', () => {
     loadPredictionPeriodTable();
     loadEstimatedOutputTable();
-});
+})});
