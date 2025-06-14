@@ -1,107 +1,48 @@
+<!--Heading-->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Manual Coordinates Input</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 600px;
-            margin: 40px auto;
-            background-color: #f9f9f9;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        }
-
-        h3 {
-            margin-bottom: 20px;
-        }
-
-        form {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .form-group {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        label {
-            width: 180px;
-            font-weight: bold;
-        }
-
-        input[type="number"] {
-            flex: 1;
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-
-        button {
-            padding: 10px;
-            background-color: #007BFF;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-            max-width: 200px;
-            align-self: flex-start;
-        }
-
-        button:hover {
-            background-color: #0056b3;
-        }
-
-        .message {
-            margin-top: 10px;
-            font-weight: bold;
-        }
-
-        .back-link {
-            margin-top: 30px;
-        }
-    </style>
 </head>
 <body>
 
+<!--Input Value-->
+
     <h3>Enter Latitude and Longitude Manually</h3>
 
+    <!--Error Text Styling-->
     {% if error %}
-        <p class="message" style="color: red;">{{ error }}</p>
+        <p style="color: red;">{{ error }}</p>
     {% endif %}
     {% if success %}
-        <p class="message" style="color: green;">{{ success }}</p> 
+        <p style="color: green;">{{ success }}</p> 
     {% endif %}
 
+    <!--Input Box-->
     <form method="POST" action="/location">
-        <div class="form-group">
-            <label for="latitude">Latitude (-90 to 90):</label>
-            <input type="number" step="0.000000000000001" name="latitude" id="latitude" min="-90" max="90" required>
-        </div>
 
-        <div class="form-group">
-            <label for="longitude">Longitude (-180 to 180):</label>
-            <input type="number" step="0.000000000000001" name="longitude" id="longitude" min="-180" max="180" required>
-        </div>
+        <!--latitude Input-->
+        <label for="latitude">Latitude (-90 - 90) :</label>
+        <input type="number" step="0.000000000000001" name="latitude" id="latitude" min="-90" max="90" value="" required><br><br>
 
+        <!--Longtitude Input-->
+        <label for="longitude">Longitude (-180 - 180) :</label>
+        <input type="number" step="0.000000000000001" name="longitude" id="longitude" min="-180" max="180" value="" required><br><br>
+        
+        <!--Save Input Button-->
         <button type="submit">Save Coordinates</button>
     </form>
 
+    <!--Result Display-->
     {% if latitude_display and longitude_display %}
         <h4>Latitude: <span id="lat-result">{{ latitude_display }}</span></h4>
         <h4>Longitude: <span id="lon-result">{{ longitude_display }}</span></h4>
     {% endif %}
 
-    <div class="back-link">
-        <p><a href="/">← Back to city/country lookup</a></p>
-    </div>
+    <!--Back button-->
+    <p><a href="/">Back to city/country lookup</a></p>
 
 </body>
 </html>
