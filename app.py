@@ -137,6 +137,9 @@ def get_energy_data():
 def serve_estimated_csv():
     base_dir = os.path.dirname(os.path.abspath(__file__))
     file_path = os.path.join(base_dir, 'Data', 'HourOrderAndEstimated.csv')
+    if not os.path.exists(file_path):
+        with open(file_path, 'w') as f:
+            f.write('Hour,Estimated Energy\n')
     return send_file(file_path, mimetype='text/csv')
 
 #Show the Total in the table
