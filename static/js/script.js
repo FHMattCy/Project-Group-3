@@ -219,8 +219,74 @@ document.getElementById('pv-form').addEventListener('submit', function (e) {
                 });
             });
     }
+    // Manual Coordinates form submission
+document.getElementById('manual-coords-form').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    const manualLat = parseFloat(document.getElementById('manual-lat').value);
+    const manualLon = parseFloat(document.getElementById('manual-lon').value);
+
+    // ตรวจสอบขอบเขตพิกัดก่อนส่ง
+    if (manualLat < -90 || manualLat > 90 || manualLon < -180 || manualLon > 180) {
+        alert("Invalid coordinates: latitude must be between -90 and 90, longitude between -180 and 180.");
+        return;
+    }
+
+    // อัปเดตค่าที่แสดง
+    document.getElementById('latitude').textContent = manualLat;
+    document.getElementById('longitude').textContent = manualLon;
+
+    // ส่งไป backend
+    sendToBackend(manualLat, manualLon);
+});
+
+document.addEventListener('device-location-obtained', function (event) {
+    const { latitude, longitude } = event.detail;
+
+    document.getElementById('latitude').textContent = latitude;
+    document.getElementById('longitude').textContent = longitude;
+
+    // ตรวจว่าใส่ค่า PV system แล้วหรือยัง
+    const area = parseFloat(document.getElementById('area').value);
+    const panelEff = parseFloat(document.getElementById('panel-eff').value);
+    const inverterEff = parseFloat(document.getElementById('inverter-eff').value);
+
+    const pvConfigured = (
+        !isNaN(area) && area >= 0.01 &&
+        !isNaN(panelEff) && panelEff >= 0.01 && panelEff <= 1 &&
+        !isNaN(inverterEff) && inverterEff >= 0.01 && inverterEff <= 1
+    );
+
+    if (pvConfigured) {
+        sendToBackend(latitude, longitude);
+    } else {
+        console.log("PV config is not set yet. Not updating predictions.");
+    }
+});
+
+document.getElementById('use-device-location').addEventListener('click', () => {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition((position) => {
+            const latitude = position.coords.latitude.toFixed(6);
+            const longitude = position.coords.longitude.toFixed(6);
+
+            // ส่ง Event กลับไปให้ script.js
+            const event = new CustomEvent('device-location-obtained', {
+                detail: { latitude, longitude }
+            });
+            document.dispatchEvent(event);
+        }, (error) => {
+            alert("Unable to retrieve your location");
+            console.error(error);
+        });
+    } else {
+        alert("Geolocation is not supported by your browser");
+    }
+});
 
 window.addEventListener('load', () => {
     loadPredictionPeriodTable();
     loadEstimatedOutputTable();
+
+    
 });

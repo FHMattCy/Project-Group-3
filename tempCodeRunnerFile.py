@@ -36,9 +36,9 @@ def predict():
     hourly_predictions = calculate_energy_output_prediction()
 
     # Ensure the directory exists
-    os.makedirs(os.path.join('Data'), exist_ok=True)
+    os.makedirs(os.path.join('Project-Group-3', 'Data'), exist_ok=True)
     # Save predictions to HourOrderAndEstimated.csv 
-    output_path = os.path.join('Data', 'HourOrderAndEstimated.csv')
+    output_path = os.path.join('Project-Group-3','Data', 'HourOrderAndEstimated.csv')
     with open(output_path, 'w', newline='', encoding='utf-8') as file:
         writer = csv.writer(file)
         writer.writerow(['Hour', 'Estimated Energy'])  # kWh
@@ -118,7 +118,7 @@ try:
             fetchSolarIrradiance(latitude, longitude)
             hourly_predictions = calculate_energy_output_prediction()
 
-            output_path = os.path.join('Data', 'HourOrderAndEstimated.csv')
+            output_path = os.path.join('Project-Group-3','Data', 'HourOrderAndEstimated.csv')
             with open(output_path, 'w', newline='', encoding='utf-8') as file:
                 writer = csv.writer(file)
                 writer.writerow(['Hour', 'Estimated Energy'])  # kWh
@@ -134,7 +134,7 @@ except Exception as e:
 def get_energy_data():
     data = []
     try:
-        file_path = os.path.join('Data', 'HourOrderAndEstimated.csv')
+        file_path = os.path.join('Project-Group-3', 'Data', 'HourOrderAndEstimated.csv')
         df = pd.read_csv(file_path)
         for _, row in df.iterrows():
             data.append({
@@ -157,7 +157,7 @@ def serve_estimated_csv():
 @app.route('/results')
 def show_results():
     try:
-        file_path = os.path.join('Data', 'HourOrderAndEstimated.csv')
+        file_path = os.path.join('Project-Group-3', 'Data', 'HourOrderAndEstimated.csv')
 
         df = pd.read_csv(file_path)
 
