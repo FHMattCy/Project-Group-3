@@ -154,28 +154,10 @@ document.getElementById('pv-form').addEventListener('submit', function (e) {
         .then(data => {
             document.getElementById('response-message').innerText = data.message;
 
-            // Get current lat/lon shown on page
-            const lat = document.getElementById('latitude').textContent;
-            const lon = document.getElementById('longitude').textContent;
-
-            // Recalculate
-            fetch('/predict', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ latitude: lat, longitude: lon })
-            })
-                .then(response => response.json())
-                .then(predictData => {
-                    console.log("Prediction after PV config update:", predictData);
-
-                    // Reload updated tables
-                    loadPredictionPeriodTable();
-                    loadEstimatedOutputTable();
-                })
-                .catch(error => {
-                    console.error("Error after PV config update:", error);
-                });
-        });
+        // Get current lat/lon shown on page
+        const lat = document.getElementById('latitude').textContent;
+        const lon = document.getElementById('longitude').textContent; 
+    });
 });
 
 
@@ -200,9 +182,9 @@ fetch('/energy_data')
 
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                        <td>${hourToPeriod(row['Hour'])}</td>
-                        <td>${energyKWh.toFixed(2)}</td>
-                    `;
+                <td>${hourToPeriod(row['Hour'])}</td>
+                <td>${energyKWh.toFixed(2)}</td>
+            `;
             tbody.appendChild(tr);
         });
 
@@ -214,52 +196,52 @@ fetch('/energy_data')
 
 // Prediction Peroid
 function loadEstimatedOutputTable() {
-    fetch('/HourOrderAndEstimated.csv')
-        .then(response => response.text())
-        .then(csvText => {
-            const lines = csvText.trim().split('\n');
-            const tableBody = document.querySelector('#energy-table tbody');
-            const totalCell = document.getElementById('total-energy');
-            tableBody.innerHTML = ''; // clear old data first
+fetch('/HourOrderAndEstimated.csv')
+    .then(response => response.text())
+    .then(csvText => {
+        const lines = csvText.trim().split('\n');
+        const tableBody = document.querySelector('#energy-table tbody');
+        const totalCell = document.getElementById('total-energy');
+        tableBody.innerHTML = ''; // clear old data first
 
-            let totalEnergyWh = 0;
+        let totalEnergyWh = 0;
 
-            lines.slice(1).forEach((line) => { // skip header
-                const [sessionLabel, energy] = line.split(',');
+        lines.slice(1).forEach((line) => { // skip header
+            const [sessionLabel, energy] = line.split(',');
 
-                const tr = document.createElement('tr');
-                const tdSession = document.createElement('td');
-                const tdEnergy = document.createElement('td');
+            const tr = document.createElement('tr');
+            const tdSession = document.createElement('td');
+            const tdEnergy = document.createElement('td');
 
-                const energyWh = parseFloat(energy.trim());
+            const energyWh = parseFloat(energy.trim());
 
-                const hourInt = parseInt(sessionLabel.trim());
-                const startHour = (21 + hourInt) % 24;  // start at 22:00 for hour = 1
-                const endHour = (startHour + 1) % 24;
-                const startStr = startHour.toString().padStart(2, '0') + ":00";
-                const endStr = endHour.toString().padStart(2, '0') + ":00";
-                tdSession.textContent = `${startStr}-${endStr}`;
-                tdEnergy.textContent = (energyWh).toFixed(3); // show as kWh
+            const hourInt = parseInt(sessionLabel.trim());
+            const startHour = (21 + hourInt) % 24;  // start at 22:00 for hour = 1
+            const endHour = (startHour + 1) % 24;
+            const startStr = startHour.toString().padStart(2, '0') + ":00";
+            const endStr = endHour.toString().padStart(2, '0') + ":00";
+            tdSession.textContent = `${startStr}-${endStr}`;
+            tdEnergy.textContent = (energyWh).toFixed(3); // show as kWh
 
-                tr.appendChild(tdSession);
-                tr.appendChild(tdEnergy);
-                tableBody.appendChild(tr);
+            tr.appendChild(tdSession);
+            tr.appendChild(tdEnergy);
+            tableBody.appendChild(tr);
 
-                totalEnergyWh += energyWh;
-            });
-
-            if (totalCell) {
-                totalCell.textContent = (totalEnergyWh).toFixed(3); // kWh
-            }
-        })
-        .catch(error => {
-            console.error('Error loading energy data:', error);
+            totalEnergyWh += energyWh;
         });
+
+        if (totalCell) {
+            totalCell.textContent = (totalEnergyWh).toFixed(3); // kWh
+        }
+    })
+    .catch(error => {
+        console.error('Error loading energy data:', error);
+    });
 }
 
 // Estimated Output data
 function loadPredictionPeriodTable() {
-    fetch('/Data/solar_radiation_data.csv')
+    fetch('/solar_radiation_data.csv')
         .then(response => response.text())
         .then(csvText => {
             const rows = csvText.trim().split('\n').slice(1); // skip header

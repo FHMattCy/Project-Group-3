@@ -78,7 +78,7 @@
 
     <p id="response-message"></p>
   
-    <script type="module" src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}" type="module"></script> <!--Added type="module"-->
 
     <h3>Power Prediction</h3>
     <table id="energy-table">

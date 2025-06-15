@@ -61,9 +61,9 @@ def predict_location():
     hourly_predictions = calculate_energy_output_prediction()
 
     # Ensure the directory exists
-    os.makedirs(os.path.join('Project-Group-3', 'Data'), exist_ok=True)
+    os.makedirs(os.path.join('Data'), exist_ok=True)
     # Save predictions to HourOrderAndEstimated.csv 
-    output_path = os.path.join('Project-Group-3','Data', 'HourOrderAndEstimated.csv')
+    output_path = os.path.join('Data', 'HourOrderAndEstimated.csv')
     with open(output_path, 'w', newline='', encoding='utf-8') as file:
         writer = csv.writer(file)
         writer.writerow(['Hour', 'Estimated Energy'])  # kWh
@@ -99,9 +99,6 @@ def enter_location():
         coords_message = f"Latitude: {latitude}, Longitude: {longitude}\n"
         with open(coords_file, 'w') as file:
             file.write(coords_message)
-
-        fetchSolarIrradiance(latitude, longitude)
-        calculate_energy_output_prediction()
 
         return render_template(
             'location.html',
@@ -146,36 +143,12 @@ def submit_pv():
 
     return jsonify({"message": "PV system configuration saved successfully."})
 
-    # Recalculate predictions after PV config is saved
-try:
-    if os.path.exists(coords_file):
-        with open(coords_file, 'r') as file:
-            coords = file.read()
-            parts = coords.replace("Latitude: ", "").replace("Longitude: ", "").split(',')
-            latitude = float(parts[0].strip())
-            longitude = float(parts[1].strip())
-
-            # Fetch irradiance and recalculate energy output
-            fetchSolarIrradiance(latitude, longitude)
-            hourly_predictions = calculate_energy_output_prediction()
-
-            output_path = os.path.join('Project-Group-3','Data', 'HourOrderAndEstimated.csv')
-            with open(output_path, 'w', newline='', encoding='utf-8') as file:
-                writer = csv.writer(file)
-                writer.writerow(['Hour', 'Estimated Energy'])  # kWh
-                for hour, value in enumerate(hourly_predictions, start=1):
-                    writer.writerow([hour, round(value, 4)])
-except Exception as e:
-    print(f"[submit_pv] Error during recalculation: {str(e)}")
-
-
-
 #Power Prediction Table
 @app.route('/energy_data', methods=['GET'])
 def get_energy_data():
     data = []
     try:
-        file_path = os.path.join('Project-Group-3', 'Data', 'HourOrderAndEstimated.csv')
+        file_path = os.path.join('Data', 'HourOrderAndEstimated.csv')
         df = pd.read_csv(file_path)
         for _, row in df.iterrows():
             data.append({
@@ -192,13 +165,16 @@ def get_energy_data():
 def serve_estimated_csv():
     base_dir = os.path.dirname(os.path.abspath(__file__))
     file_path = os.path.join(base_dir, 'Data', 'HourOrderAndEstimated.csv')
+    if not os.path.exists(file_path):
+        with open(file_path, 'w') as f:
+            f.write('Hour,Estimated Energy\n')
     return send_file(file_path, mimetype='text/csv')
 
 #Show the Total in the table
 @app.route('/results')
 def show_results():
     try:
-        file_path = os.path.join('Project-Group-3', 'Data', 'HourOrderAndEstimated.csv')
+        file_path = os.path.join('Data', 'HourOrderAndEstimated.csv')
 
         df = pd.read_csv(file_path)
 
