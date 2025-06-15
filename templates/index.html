@@ -7,83 +7,95 @@
 </head>
 <body>
 
-    <h3>Enter City and Country to Get Latitude and Longitude</h3>
+    <header><h1>PredictiveVoltaic</h1> <!--Name from readme.md file. Can be changed if needed.--></header>
 
-    <!-- Location Input by City/Country -->
-    <form id="location-form">
+    <div class="container">
 
-        <label for="city">City:</label>
-        <input type="text" id="city" name="city" required><br><br>
+        <br><hr><br>
 
-        <label for="country">Country:</label>
-        <input type="text" id="country" name="country" required><br><br>
+        <div class="card">
+            <div class="container">
+                <h3>Enter City and Country to Get Latitude and Longitude</h3>
+                <!-- Location Input by City/Country -->
+                <form id="location-form">
 
-        <button type="submit">Get Latitude & Longitude</button>
+                    <label for="city">City:</label>
+                    <input type="text" id="city" name="city" required><br><br>
 
-        <br><br>
+                    <label for="country">Country:</label>
+                    <input type="text" id="country" name="country" required><br><br>
 
-        <button type="button" id="use-device-location">Use Device Location</button>
-    </form>
+                    <button type="submit">Get Latitude & Longitude</button>
 
-    <!-- Result Display -->
-    <h4>Latitude: <span id="latitude"></span></h4>
-    <h4>Longitude: <span id="longitude"></span></h4>
+                    <br><br>
 
-    <hr><br>
+                    <button type="button" id="use-device-location">Use Device Location</button>
+                </form>
+                <!-- Result Display -->
+                <h4>Latitude: <span id="latitude"></span></h4>
+                <h4>Longitude: <span id="longitude"></span></h4>
 
-    <!-- Manual Coordinate Input Form -->
-    <h3>Or Enter Coordinates Manually</h3>
-    <form id="manual-coords-form">
-        <label for="manual-lat">Latitude (-90 - 90) :</label>
-        <input type="number" step="0.000001" id="manual-lat" name="manual-lat" required><br><br>
+            </div>
+        </div>
 
-        <label for="manual-lon">Longitude (-180 - 180):</label>
-        <input type="number" step="0.000001" id="manual-lon" name="manual-lon" required><br><br>
+        <br><hr><br>
 
-        <button type="submit">Submit Coordinates</button>
-        
-    </form>
+        <div class="card">
+            <!-- Manual Coordinate Input Form -->
+            <h3>Or Enter Coordinates Manually</h3>
+            <form id="manual-coords-form">
+                <label for="manual-lat">Latitude (-90 - 90) :</label>
+                <input type="number" step="0.000001" id="manual-lat" name="manual-lat" required><br><br>
 
-    <br><hr><br>
+                <label for="manual-lon">Longitude (-180 - 180):</label>
+                <input type="number" step="0.000001" id="manual-lon" name="manual-lon" required><br><br>
 
-    <!-- PV System Configuration -->
-    <h3>Enter Your PV System Details</h3>
-    <form id="pv-form">
+                <button type="submit">Submit Coordinates</button>
+                
+            </form>
+        </div>
 
-        <label>Panel Area (m²):</label>
-        <input type="number" step="0.01" id="area" min="1" required><br><br>
+        <br><hr><br>
 
-        <label>Panel Efficiency (0-1):</label>
-        <input type="number" step="0.01" id="panel-eff" min="0" max="1" required><br><br>
+        <div class="card">
+            <!-- PV System Configuration -->
+            <h3>Enter Your PV System Details</h3>
+            <form id="pv-form">
 
-        <label>Inverter Efficiency (0-1):</label>
-        <input type="number" step="0.01" id="inverter-eff" min="0" max="1" required><br><br>
+                <label>Panel Area (m²):</label>
+                <input type="number" step="0.01" id="area" min="1" required><br><br>
 
-        <button type="submit">Submit</button>
-    </form>
+                <label>Panel Efficiency (0-1):</label>
+                <input type="number" step="0.01" id="panel-eff" min="0" max="1" required><br><br>
 
-    <p id="response-message"></p>
+                <label>Inverter Efficiency (0-1):</label>
+                <input type="number" step="0.01" id="inverter-eff" min="0" max="1" required><br><br>
 
-    <script src="{{ url_for('static', filename='js/script.js') }}" type="module"></script>
+                <button type="submit">Submit</button>
+            </form>
+            <p id="response-message"></p>
+        </div>
 
-    <h3>Power Prediction</h3>
-    <table id="energy-table">
-        <thead>
-            <tr>
-                <th>Prediction Period (1 hour per period)</th>
-                <th>Estimated Output (kWh)</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- Data will be inserted here by JavaScript -->
-        </tbody>
-        <tfoot>
-            <tr>
-                <td><strong>Total</strong></td>
-                <td id="total-energy"><strong>0.00</strong></td>
-            </tr>
-        </tfoot>
-    </table>
+        <script src="{{ url_for('static', filename='js/script.js') }}" type="module"></script>
 
+        <h3>Power Prediction</h3>
+        <table id="energy-table">
+            <thead>
+                <tr>
+                    <th>Prediction Period (1 hour per period)</th>
+                    <th>Estimated Output (kWh)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Data will be inserted here by JavaScript -->
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td><strong>Total</strong></td>
+                    <td id="total-energy"><strong>0.00</strong></td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
 </body>
 </html>
