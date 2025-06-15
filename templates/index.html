@@ -7,15 +7,7 @@
 </head>
 <body>
 
-    
-<div class="container">
-    <!-- Section 1: Location -->
-    <div class="card">
-        <h1>PredictiveVoltaic</h1> <!--Name from readme.md file. Can be changed if needed.-->
-        <h3>Enter City and Country to Get Latitude and Longitude</h3>
-        <form id="location-form">
-            <label for="city">City:</label>
-            <input type="text" id="city" name="city" required>
+    <h3>Enter City and Country to Get Latitude and Longitude</h3>
 
     <!-- Location Input by City/Country -->
     <form id="location-form">
@@ -28,15 +20,10 @@
 
         <button type="submit">Get Latitude & Longitude</button>
 
-    <!-- Section 2: PV system -->
-    <div class="card">
-        <h3>Enter Your PV System Details</h3>
-        <form id="pv-form">
-            <label for="area">Panel Area (m²):</label>
-            <input type="number" step="0.01" id="area" required>
+        <br><br>
 
-            <label for="panel-eff">Panel Efficiency (0-1):</label>
-            <input type="number" step="0.01" id="panel-eff" min="0" max="1" required>
+        <button type="button" id="use-device-location">Use Device Location</button>
+    </form>
 
     <!-- Result Display -->
     <h4>Latitude: <span id="latitude"></span></h4>
@@ -97,39 +84,6 @@
             </tr>
         </tfoot>
     </table>
-            <label for="inverter-eff">Inverter Efficiency (0-1):</label>
-            <input type="number" step="0.01" id="inverter-eff" min="0" max="1" required>
-
-            <button type="submit">Submit</button>
-        </form>
-
-        <p id="response-message"></p>
-  
-        <script src="{{ url_for('static', filename='js/script.js') }}" type="module"></script> <!--Added type="module"-->
-    </div>
-
-    <!-- Section 3: Output Table -->
-    <div class="card">
-        <h3>Power Prediction</h3>
-        <table id="energy-table">
-            <thead>
-                <tr>
-                    <th>Prediction Period (1 hour per period)</th>
-                    <th>Estimated Output (kWh)</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- JS will populate here -->
-            </tbody>
-            <tfoot>
-                <tr>
-                    <td>Total</td>
-                    <td id="total-energy">0.000</td>
-                </tr>
-            </tfoot>
-        </table>
-    </div>
-</div>
 
 </body>
 </html>

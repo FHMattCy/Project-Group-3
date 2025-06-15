@@ -71,36 +71,6 @@ document.getElementById('pv-form').addEventListener('submit', function (e) {
         return;
     }
 
-
-    // Try to look for an invalid values.
-    try {
-        if (!areaBetween(area, 0.01) && !between(panelEff, 0.01, 1) && !between(inverterEff, 0.01, 1)) throw "invalid value(s)."; //Check for values out of bounds then throw an error.
-
-        if (areaBetween(area, 0.01) && between(panelEff, 0.01, 1) && between(inverterEff, 0.01, 1)) {
-            //Summit form if all values are in range.
-            fetch('/submit_pv', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    area: area,
-                    panel_efficiency: panelEff,
-                    inverter_efficiency: inverterEff
-                    })
-                })
-                .then(res => res.json())
-                .then(data => {
-                    document.getElementById('response-message').innerText = data.message;
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    document.getElementById('response-message').innerText = 'An error occurred.';
-                });
-        }
-    // Catch and show error.
-    } catch(error) {
-        console.error('Error:', error)
-        document.getElementById('response-message').innerText = 'Input is ' + error;
-
     // Submit only if valid
     fetch('/submit_pv', {
         method: 'POST',
@@ -137,7 +107,8 @@ document.getElementById('pv-form').addEventListener('submit', function (e) {
             console.error("Error after PV config update:", error);
         });
     });
-};
+});
+
 
     // Prepare to save Estimated Outout in the table
     fetch('/energy_data')
@@ -316,4 +287,6 @@ document.getElementById('use-device-location').addEventListener('click', () => {
 window.addEventListener('load', () => {
     loadPredictionPeriodTable();
     loadEstimatedOutputTable();
-})});
+
+    
+});
