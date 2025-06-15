@@ -1,62 +1,117 @@
 body {
-    font-family: Arial, sans-serif;
-    text-align: center;
-    margin: 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f3f4f6;
+    margin: 0;
+    padding: 30px;
+    display: flex;
+    justify-content: center;
+    color: #333;
 }
 
-form {
-    margin: 20px auto;
-    display: inline-block;
-}
-
-input {
-    width: 200px;
-    padding: 5px;
-}
-
-button {
-    padding: 8px 16px;
-    cursor: pointer;
-}
-
-a {
-    display: block;
-    margin-top: 20px;
-    color: blue;
-}
-
-/* Make the table to stay in the middle */
-body {
-    font-family: Arial, sans-serif;
-    text-align: center;
+.container {
+    width: 100%;
+    max-width: 960px;
     padding: 20px;
 }
 
-/* Decorate form */
-form {
+/* Card block */
+.card {
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+    padding: 30px;
     margin-bottom: 30px;
 }
 
-/* Decorate table */
-table#energy-table {
-    margin: 0 auto; /* center table horizontally */
-    border-collapse: collapse;
-    width: 60%; /* optional: set width */
+/* Section header */
+.card h3 {
+    margin-top: 0;
+    color: #2563eb;
 }
 
-/* Head of table */
-#energy-table th, #energy-table td {
-    border: 1px solid #333;
-    padding: 8px 12px;
+/* Form style */
+form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    align-items: center;
+    margin-top: 15px;
+}
+
+label {
+    flex: 1 1 150px;
+    font-weight: 600;
+}
+
+input {
+    flex: 2 1 200px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+/* Button style */
+button {
+    padding: 10px 16px;
+    background-color: #2563eb;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #1d4ed8;
+}
+
+/* Link style */
+a {
+    color: #2563eb;
+    text-decoration: none;
+    font-size: 14px;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Result output */
+.result {
+    margin-top: 15px;
+    font-weight: bold;
+}
+
+/* Table */
+table#energy-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+#energy-table th,
+#energy-table td {
+    border: 1px solid #ddd;
+    padding: 10px;
     text-align: center;
 }
 
-/* Color of head table */
 #energy-table thead {
-    background-color: #f2f2f2;
+    background-color: #e0f2fe;
+    font-weight: bold;
 }
 
-/* Switch color each row */
 #energy-table tbody tr:nth-child(even) {
     background-color: #f9f9f9;
+}
+
+#energy-table tfoot {
+    background-color: #f0f9ff;
+    font-weight: bold;
+}
+
+#response-message {
+    margin-top: 10px;
+    color: green;
+    font-weight: 600;
 }
