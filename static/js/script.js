@@ -147,6 +147,8 @@ fetch('/energy_data')
             `;
             tbody.appendChild(tr);
         });
+    });
+};
 
         document.getElementById('total-energy').innerHTML = `<strong>${total.toFixed(2)}</strong>`;
     })
