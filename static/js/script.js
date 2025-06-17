@@ -60,70 +60,84 @@ document.getElementById('time-period-form').addEventListener('submit', async fun
     const warningElement = document.getElementById('time-period-form-warning');
     warningElement.textContent = '';
 
-    const startDateTimeStr = document.getElementById('start-date-time').value;
-    const endDateTimeStr = document.getElementById('end-date-time').value;
+    const start = document.getElementById('start-date-time').value.trim();
+    const end = document.getElementById('end-date-time').value.trim();
 
-    const startDateTime = new Date(startDateTimeStr);
-    const endDateTime = new Date(endDateTimeStr);
-    const now = new Date();
-    const maxEndTime = new Date();
-    maxEndTime.setDate(now.getDate() + 16);
+    const startDateTime = new Date(start);
+    const endDateTime = new Date(end);
+    const currentDateTime = new Date();
 
-    if (isNaN(startDateTime.getTime())) {
-        if (isNaN(endDateTime.getTime())) {
-            // Both are invalid
-            startDateTime = new Date(now);
-            endDateTime = new Date(now.getTime() + 24 * 60 * 60 * 1000); // now + 24h
+    if (isNaN(startDateTime.getTime()) || isNaN(endDateTime.getTime())) {
+        warningElement.textContent = 'Invalid date/time format. Use ISO like: 2025-06-01T00:00';
+        return;
+    }
+
+    function addHours(date, hours) {
+        return new Date(date.getTime() + hours * 60 * 60 * 1000);
+    }
+
+    if (!startDateTime && endDateTime) {
+        if (endDateTime > currentDateTime) {
+            // endDateTime in future, set startDateTime = now
+            startDateTime = currentDateTime;
+            start = startDateTime.toISOString().slice(0,16); // format as yyyy-MM-ddTHH:mm
         } else {
-            // Only start is invalid
-            startDateTime = new Date(now);
+            // endDateTime in past, startDateTime = 24h before endDateTime
+            startDateTime = addHours(endDateTime, -24);
+            start = startDateTime.toISOString().slice(0,16);
         }
-    } else {
-        if (isNaN(endDateTime.getTime())) {
-            // Only end is invalid
-            endDateTime = new Date(startDateTime.getTime() + 24 * 60 * 60 * 1000); // start + 24h
-        }
-}
+    } else if (!startDateTime && !endDateTime) {
+        // both empty, start=now, end=24h later
+        startDateTime = currentDateTime;
+        endDateTime = addHours(currentDateTime, 24);
+        start = startDateTime.toISOString().slice(0,16);
+        end = endDateTime.toISOString().slice(0,16);
+    } else if (startDateTime && !endDateTime) {
+        // start present, end empty -> end = 24h after start
+        endDateTime = addHours(startDateTime, 24);
+        end = endDateTime.toISOString().slice(0,16);
+    }
 
     if (startDateTime >= endDateTime) {
-        warningElement.textContent = 'Start date & time must be before end date & time.';
+        warningElement.textContent = 'Start time must be before end time.';
         return;
     }
 
-    const oneHourMs = 60 * 60 * 1000;
-    if ((endDateTime - startDateTime) < oneHourMs) {
-        warningElement.textContent = 'There must be at least a 1 hour difference between start and end times.';
+    // Get current lat/lon from UI
+    const latitude = parseFloat(document.getElementById('latitude').textContent);
+    const longitude = parseFloat(document.getElementById('longitude').textContent);
+
+    if (isNaN(latitude) || isNaN(longitude)) {
+        warningElement.textContent = 'Latitude and longitude are not set. Please select a location first.';
         return;
     }
 
-    // API is limited to 16 day forecast
-    if (endDateTime > maxEndTime) {
-        warningElement.textContent = 'End date & time cannot be more than 16 days from today.';
-        return;
-    }
-
-    // Proceed to fetch since validation passed...
     try {
-        const response = await fetch('/test_fetch', {
+        const response = await fetch('/predict', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ start_datetime: startDateTimeStr, end_datetime: endDateTimeStr })
+            body: JSON.stringify({
+                latitude: latitude,
+                longitude: longitude,
+                start_datetime: start,
+                end_datetime: end
+            })
         });
 
         const data = await response.json();
-
         if (data.error) {
-            warningElement.textContent = data.reason;
+            warningElement.textContent = data.reason || 'Error during prediction.';
         } else {
-            console.log('Response:', data);
+            console.log('Prediction success:', data);
         }
-    } catch (error) {
-        warningElement.textContent = 'Error sending data: ' + error.message;
-        console.error('Error:', error);
+    } catch (err) {
+        warningElement.textContent = 'Failed to fetch prediction: ' + err.message;
+        console.error(err);
     }
-  });
+});
 
-  // PV system form submission
+
+// PV system form submission
 document.getElementById('pv-form').addEventListener('submit', function (e) {
     e.preventDefault();
 
@@ -154,10 +168,10 @@ document.getElementById('pv-form').addEventListener('submit', function (e) {
         .then(data => {
             document.getElementById('response-message').innerText = data.message;
 
-        // Get current lat/lon shown on page
-        const lat = document.getElementById('latitude').textContent;
-        const lon = document.getElementById('longitude').textContent; 
-    });
+            // Get current lat/lon shown on page
+            const lat = document.getElementById('latitude').textContent;
+            const lon = document.getElementById('longitude').textContent;
+        });
 });
 
 
@@ -196,47 +210,47 @@ fetch('/energy_data')
 
 // Prediction Peroid
 function loadEstimatedOutputTable() {
-fetch('/HourOrderAndEstimated.csv')
-    .then(response => response.text())
-    .then(csvText => {
-        const lines = csvText.trim().split('\n');
-        const tableBody = document.querySelector('#energy-table tbody');
-        const totalCell = document.getElementById('total-energy');
-        tableBody.innerHTML = ''; // clear old data first
+    fetch('/HourOrderAndEstimated.csv')
+        .then(response => response.text())
+        .then(csvText => {
+            const lines = csvText.trim().split('\n');
+            const tableBody = document.querySelector('#energy-table tbody');
+            const totalCell = document.getElementById('total-energy');
+            tableBody.innerHTML = ''; // clear old data first
 
-        let totalEnergyWh = 0;
+            let totalEnergyWh = 0;
 
-        lines.slice(1).forEach((line) => { // skip header
-            const [sessionLabel, energy] = line.split(',');
+            lines.slice(1).forEach((line) => { // skip header
+                const [sessionLabel, energy] = line.split(',');
 
-            const tr = document.createElement('tr');
-            const tdSession = document.createElement('td');
-            const tdEnergy = document.createElement('td');
+                const tr = document.createElement('tr');
+                const tdSession = document.createElement('td');
+                const tdEnergy = document.createElement('td');
 
-            const energyWh = parseFloat(energy.trim());
+                const energyWh = parseFloat(energy.trim());
 
-            const hourInt = parseInt(sessionLabel.trim());
-            const startHour = (21 + hourInt) % 24;  // start at 22:00 for hour = 1
-            const endHour = (startHour + 1) % 24;
-            const startStr = startHour.toString().padStart(2, '0') + ":00";
-            const endStr = endHour.toString().padStart(2, '0') + ":00";
-            tdSession.textContent = `${startStr}-${endStr}`;
-            tdEnergy.textContent = (energyWh).toFixed(3); // show as kWh
+                const hourInt = parseInt(sessionLabel.trim());
+                const startHour = (21 + hourInt) % 24;  // start at 22:00 for hour = 1
+                const endHour = (startHour + 1) % 24;
+                const startStr = startHour.toString().padStart(2, '0') + ":00";
+                const endStr = endHour.toString().padStart(2, '0') + ":00";
+                tdSession.textContent = `${startStr}-${endStr}`;
+                tdEnergy.textContent = (energyWh).toFixed(3); // show as kWh
 
-            tr.appendChild(tdSession);
-            tr.appendChild(tdEnergy);
-            tableBody.appendChild(tr);
+                tr.appendChild(tdSession);
+                tr.appendChild(tdEnergy);
+                tableBody.appendChild(tr);
 
-            totalEnergyWh += energyWh;
+                totalEnergyWh += energyWh;
+            });
+
+            if (totalCell) {
+                totalCell.textContent = (totalEnergyWh).toFixed(3); // kWh
+            }
+        })
+        .catch(error => {
+            console.error('Error loading energy data:', error);
         });
-
-        if (totalCell) {
-            totalCell.textContent = (totalEnergyWh).toFixed(3); // kWh
-        }
-    })
-    .catch(error => {
-        console.error('Error loading energy data:', error);
-    });
 }
 
 // Estimated Output data

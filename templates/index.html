@@ -39,17 +39,19 @@
 
     <br><hr><br>
 
-    <form id="time-period-form">
+    <h1>Test Irradiance Fetch</h1>
 
-        <label for="start-date-time">Start Date & Time:</label>
-        <input type="datetime-local" id="start-date-time" name="start_date_time"><br><br>
+        <form id="time-period-form">
 
-        <label for="end-date-time">End Date & Time:</label>
-        <input type="datetime-local" id="end-date-time" name="end_date_time"><br><br>
+            <label for="start-date-time">Start DateTime:</label>
+            <input type="datetime-local" id="start-date-time" name="start_datetime" placeholder="yyyy-mm-ddThh:mm"><br><br>
 
-        <button type="submit">Submit</button>
+            <label for="end-date-time">End DateTime:</label>
+            <input type="datetime-local" id="end-date-time" name="end_datetime" placeholder="yyyy-mm-ddThh:mm"><br><br>
 
-    </form>
+            <button type="submit">Submit</button>
+
+        </form>
 
     <p id="time-period-form-warning" style="color: red; font-weight: bold;"></p> <!-- move the styling to css!!! -->
 
