@@ -32,7 +32,7 @@ def fetchSolarIrradiance(latitude, longitude, start_date_time, end_date_time):
 
     # Process first location. Add a for-loop for multiple locations or weather models
     response = responses[0]
-    print(f"Coordinates {response.Latitude()}°N {response.Longitude()}°E")
+    print(f"Coordinates {response.Latitude()}N {response.Longitude()}E")
     print(f"Elevation {response.Elevation()} m asl")
     print(f"Timezone {response.Timezone()}{response.TimezoneAbbreviation()}")
     print(f"Timezone difference to GMT+0 {response.UtcOffsetSeconds()} s")
@@ -64,14 +64,14 @@ def fetchSolarIrradiance(latitude, longitude, start_date_time, end_date_time):
     print(hourly_dataframe)
 
     #Create a folder name "data"
-    # base_dir = os.path.dirname(os.path.abspath(__file__))
+    base_dir = os.path.dirname(os.path.abspath(__file__))
     # data_dir = os.path.join(base_dir, "data")
     # os.makedirs(data_dir, exist_ok=True)
 
     #Save as solar_radiation_data.csv to folder name "data"
     # minutely_15_csv_path = os.path.join(data_dir, "minutely_15_solar_radiation_data.csv")
     # hourly_csv_path = os.path.join(data_dir, "solar_radiation_data.csv")
-    hourly_csv_path = os.path.join("solar_radiation_data.csv")
+    hourly_csv_path = os.path.join(base_dir, "solar_radiation_data.csv")
     hourly_dataframe.to_csv(hourly_csv_path, index=False)
     print(f"Solar radiation data saved")
 
