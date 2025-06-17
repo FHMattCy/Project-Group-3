@@ -35,9 +35,9 @@ def predict_location():
     hourly_predictions = calculate_energy_output_prediction()
 
     # Ensure the directory exists
-    os.makedirs(os.path.join('Data'), exist_ok=True)
+    os.makedirs(os.path.join('data'), exist_ok=True)
     # Save predictions to HourOrderAndEstimated.csv 
-    output_path = os.path.join('Data', 'HourOrderAndEstimated.csv')
+    output_path = os.path.join('data', 'HourOrderAndEstimated.csv')
     with open(output_path, 'w', newline='', encoding='utf-8') as file:
         writer = csv.writer(file)
         writer.writerow(['Hour', 'Estimated Energy'])  # kWh
