@@ -65,13 +65,13 @@ def fetchSolarIrradiance(latitude, longitude, start_date_time, end_date_time):
 
     #Create a folder name "data"
     base_dir = os.path.dirname(os.path.abspath(__file__))
-    # data_dir = os.path.join(base_dir, "data")
-    # os.makedirs(data_dir, exist_ok=True)
+    data_dir = os.path.join(base_dir, "data")
+    os.makedirs(data_dir, exist_ok=True)
 
     #Save as solar_radiation_data.csv to folder name "data"
     # minutely_15_csv_path = os.path.join(data_dir, "minutely_15_solar_radiation_data.csv")
-    # hourly_csv_path = os.path.join(data_dir, "solar_radiation_data.csv")
-    hourly_csv_path = os.path.join(base_dir, "solar_radiation_data.csv")
+    hourly_csv_path = os.path.join(data_dir, "solar_radiation_data.csv")
+    # hourly_csv_path = os.path.join(base_dir, "solar_radiation_data.csv")
     hourly_dataframe.to_csv(hourly_csv_path, index=False)
     print(f"Solar radiation data saved")
 
