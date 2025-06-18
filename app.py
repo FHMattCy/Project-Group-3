@@ -117,6 +117,13 @@ def submit_pv():
 
     return jsonify({"message": "PV system configuration saved successfully."})
 
+#Check if pv_config.txt exists
+@app.route('/check_pv_config')
+def check_pv_config():
+    file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'pv_config.txt')
+    exists = os.path.exists(file_path)
+    return jsonify({'exists': exists})  
+
 #Power Prediction Table
 @app.route('/energy_data', methods=['GET'])
 def get_energy_data():

@@ -134,48 +134,59 @@ function sendToBackend(latitude, longitude, start, end) {
         });
 }
 
+async function pvConfigExists() {
+    try {
+        const response = await fetch('/check_pv_config');
+        const result = await response.json();
+        return result.exists;
+    } catch (err) {
+        console.error("Error checking pv_config.txt:", err);
+        return false; // default to false on error
+    }
+}
+
 document.getElementById('time-period-form').addEventListener('submit', async function (event) {
     event.preventDefault();
 
     const warningElement = document.getElementById('time-period-form-warning');
     warningElement.textContent = '';
 
-    const startDateTime = new Date(document.getElementById('start-date-time').value.trim());
-    const endDateTime = new Date(document.getElementById('end-date-time').value.trim());
+    const startInput = document.getElementById('start-date-time').value.trim();
+    const endInput = document.getElementById('end-date-time').value.trim();
+
     const currentDateTime = new Date();
+    let startDateTime = startInput ? new Date(startInput) : null;
+    let endDateTime = endInput ? new Date(endInput) : null;
 
-    let start = startDateTime.toISOString().slice(0,16);;
-    let end = endDateTime.toISOString().slice(0,16);
-
-    if (isNaN(startDateTime.getTime()) || isNaN(endDateTime.getTime())) {
-        warningElement.textContent = 'Invalid date/time format. Use ISO like: 2025-06-01T00:00';
-        return;
-    }
-
+    // Helper to add hours
     function addHours(date, hours) {
         return new Date(date.getTime() + hours * 60 * 60 * 1000);
     }
 
-    if (!startDateTime && endDateTime) {
-        if (endDateTime > currentDateTime) {
-            // endDateTime in future, set startDateTime = now
-            startDateTime = currentDateTime;
-            start = startDateTime.toISOString().slice(0,16); // format as yyyy-MM-ddTHH:mm
-        } else {
-            // endDateTime in past, startDateTime = 24h before endDateTime
-            startDateTime = addHours(endDateTime, -24);
-            start = startDateTime.toISOString().slice(0,16);
-        }
-    } else if (!startDateTime && !endDateTime) {
-        // both empty, start=now, end=24h later
+    // If both empty
+    if (!startDateTime && !endDateTime) {
         startDateTime = currentDateTime;
         endDateTime = addHours(currentDateTime, 24);
-        start = startDateTime.toISOString().slice(0,16);
-        end = endDateTime.toISOString().slice(0,16);
-    } else if (startDateTime && !endDateTime) {
-        // start present, end empty -> end = 24h after start
+    }
+
+    // Only end provided
+    else if (!startDateTime && endDateTime) {
+        if (endDateTime > currentDateTime) {
+            startDateTime = currentDateTime;
+        } else {
+            startDateTime = addHours(endDateTime, -24);
+        }
+    }
+
+    // Only start provided
+    else if (startDateTime && !endDateTime) {
         endDateTime = addHours(startDateTime, 24);
-        end = endDateTime.toISOString().slice(0,16);
+    }
+
+    // Validate dates
+    if (isNaN(startDateTime.getTime()) || isNaN(endDateTime.getTime())) {
+        warningElement.textContent = 'Invalid date/time format.';
+        return;
     }
 
     if (startDateTime >= endDateTime) {
@@ -183,7 +194,9 @@ document.getElementById('time-period-form').addEventListener('submit', async fun
         return;
     }
 
-    // Get current lat/lon from UI
+    const start = startDateTime.toISOString().slice(0, 16);
+    const end = endDateTime.toISOString().slice(0, 16);
+
     const latitude = parseFloat(document.getElementById('latitude').textContent);
     const longitude = parseFloat(document.getElementById('longitude').textContent);
 
@@ -191,6 +204,11 @@ document.getElementById('time-period-form').addEventListener('submit', async fun
         warningElement.textContent = 'Latitude and longitude are not set. Please select a location first.';
         return;
     }
+
+    if (!(await pvConfigExists())) {
+    warningElement.textContent = 'PV system specifications are not set. Please submit your PV system specs first.';
+    return;
+}
 
     try {
         await sendToBackend(latitude, longitude, start, end);
