@@ -34,8 +34,7 @@
     <h4>Longitude: <span id="longitude"></span></h4>
 
     <!--Enter Cords. Manual Button-->
-    <p><a href="/location">Want to enter coordinates manually?</a></p>
-
+    <!-- <p><a href="/location">Want to enter coordinates manually?</a></p> -->
 
     <br><hr><br>
 
@@ -61,6 +60,26 @@
     </form>
 
     <p id="response-message"></p>
+
+    <br><hr><br>
+
+    <h1>Choose Time Period</h1>
+
+        <form id="time-period-form">
+
+            <label for="start-date-time">Start DateTime:</label>
+            <input type="datetime-local" id="start-date-time" name="start_datetime" placeholder="yyyy-mm-ddThh:mm"><br><br>
+
+            <label for="end-date-time">End DateTime:</label>
+            <input type="datetime-local" id="end-date-time" name="end_datetime" placeholder="yyyy-mm-ddThh:mm"><br><br>
+
+            <button type="submit">Predict</button>
+
+        </form>
+
+    <p id="time-period-form-warning" style="color: red; font-weight: bold;"></p> <!-- move the styling to css!!! -->
+
+    <br><hr><br>
   
     <script src="{{ url_for('static', filename='js/script.js') }}" type="module"></script> <!--Added type="module"-->
 

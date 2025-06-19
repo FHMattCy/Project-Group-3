@@ -4,7 +4,7 @@ import os
 #For reading solar_radiation_data.csv
 def calculate_energy_output_prediction():
     base_dir = os.path.dirname(os.path.abspath(__file__))
-    csv_path = os.path.join(base_dir, "Data", "solar_radiation_data.csv")
+    csv_path = os.path.join(base_dir, "data", "solar_radiation_data.csv")
     """
     Generate a prediction for energy produced by a PV system over a period of time.
     Prints cumulative energy output hour by hour.

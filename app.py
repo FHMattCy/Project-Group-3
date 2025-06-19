@@ -20,8 +20,10 @@ def index():
 @app.route('/predict', methods=['POST'])
 def predict_location():
     data = request.get_json()
-    latitude = data.get('latitude')
-    longitude = data.get('longitude')
+    latitude = float(data['latitude'])
+    longitude = float(data['longitude'])
+    start = data['start_datetime']
+    end = data['end_datetime']
 
     if latitude is None or longitude is None:
         return jsonify({"error": "Latitude and longitude are required"}), 400
@@ -29,13 +31,13 @@ def predict_location():
     with open(coords_file, 'w') as file:
         file.write(f"Latitude: {latitude}, Longitude: {longitude}\n")
 
-    fetchSolarIrradiance(latitude, longitude)
+    fetchSolarIrradiance(latitude, longitude, start, end)
     hourly_predictions = calculate_energy_output_prediction()
 
     # Ensure the directory exists
-    os.makedirs(os.path.join('Data'), exist_ok=True)
+    os.makedirs(os.path.join('data'), exist_ok=True)
     # Save predictions to HourOrderAndEstimated.csv 
-    output_path = os.path.join('Data', 'HourOrderAndEstimated.csv')
+    output_path = os.path.join('data', 'HourOrderAndEstimated.csv')
     with open(output_path, 'w', newline='', encoding='utf-8') as file:
         writer = csv.writer(file)
         writer.writerow(['Hour', 'Estimated Energy'])  # kWh
@@ -115,12 +117,19 @@ def submit_pv():
 
     return jsonify({"message": "PV system configuration saved successfully."})
 
+#Check if pv_config.txt exists
+@app.route('/check_pv_config')
+def check_pv_config():
+    file_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'pv_config.txt')
+    exists = os.path.exists(file_path)
+    return jsonify({'exists': exists})  
+
 #Power Prediction Table
 @app.route('/energy_data', methods=['GET'])
 def get_energy_data():
     data = []
     try:
-        file_path = os.path.join('Data', 'HourOrderAndEstimated.csv')
+        file_path = os.path.join('data', 'HourOrderAndEstimated.csv')
         df = pd.read_csv(file_path)
         for _, row in df.iterrows():
             data.append({
@@ -133,20 +142,28 @@ def get_energy_data():
     return jsonify(data)
 
 #Send HourOrderAndEstimated.csv to front end
-@app.route('/HourOrderAndEstimated.csv')
+@app.route('/data/HourOrderAndEstimated.csv')
 def serve_estimated_csv():
     base_dir = os.path.dirname(os.path.abspath(__file__))
-    file_path = os.path.join(base_dir, 'Data', 'HourOrderAndEstimated.csv')
+    file_path = os.path.join(base_dir, 'data', 'HourOrderAndEstimated.csv')
     if not os.path.exists(file_path):
         with open(file_path, 'w') as f:
             f.write('Hour,Estimated Energy\n')
+    return send_file(file_path, mimetype='text/csv')
+
+@app.route('/data/solar_radiation_data.csv')
+def serve_radiation_csv():
+    file_path = os.path.join('data', 'solar_radiation_data.csv')
+    if not os.path.exists(file_path):
+        with open(file_path, 'w') as f:
+            f.write('timestamp,solar_radiation\n')
     return send_file(file_path, mimetype='text/csv')
 
 #Show the Total in the table
 @app.route('/results')
 def show_results():
     try:
-        file_path = os.path.join('Data', 'HourOrderAndEstimated.csv')
+        file_path = os.path.join('data', 'HourOrderAndEstimated.csv')
 
         df = pd.read_csv(file_path)
 
